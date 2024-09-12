@@ -41,7 +41,8 @@ FILE(GLOB SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/QT/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/ROS2/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/OpenGL/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Graphics/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/*.cpp"
 
 )
 
