@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/eye.png</file>
+        <!--<a href="https://www.flaticon.com/kr/free-icons/" title="눈 아이콘">눈 아이콘 제작자: joalfa - Flaticon</a>-->
+        <file>resources/hammer.png</file>
+        <!--<a href="https://www.flaticon.com/kr/free-icons/" title="망치 아이콘">망치 아이콘 제작자: Pixel perfect - Flaticon</a>-->
+        <file>resources/flag.png</file>
+        <!--<a href="https://www.flaticon.com/kr/free-icons/-" title="빨간 깃발 아이콘">빨간 깃발 아이콘 제작자: Freepik - Flaticon</a>-->
+    </qresource>
+</RCC>
