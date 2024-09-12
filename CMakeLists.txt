@@ -29,7 +29,7 @@ find_package(rclcpp REQUIRED)
 
 # Qt 경로 설정
 # To Do : relative path
-set(CMAKE_PREFIX_PATH "/root/share/code/gui/3rdParty/Qt6/lib/cmake/Qt6;/root/share/code/gui/3rdParty/Qt6/lib/cmake")
+set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Qt6/lib/cmake/Qt6;${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Qt6/lib/cmake")
 find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui OpenGL OpenGLWidgets)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -41,6 +41,7 @@ FILE(GLOB SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/QT/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/ROS2/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/OpenGL/*.cpp"
 
 )
 
@@ -52,6 +53,7 @@ FILE(GLOB MOC_HEADERS
 
 set(HEADERS
         "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glm-1.0.1/glm"
 )
 
 set(RESOURCES
