@@ -7,19 +7,32 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_4_5_Core>
 #include <QTimer>
+#include "Graphics/PointRenderer.h"
+#include "Graphics/Camera.h"
 
 class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_5_Core
 {
 Q_OBJECT
 
+private: // tmp test
+    Graphics::IPointRenderer* pointRenderer = nullptr;
 protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
 
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
+protected:
+    Graphics::InteractionCamera mCamera;
+    QTimer* timer;
 public:
-    OpenGLWidget(QWidget *parent = nullptr);
+    explicit OpenGLWidget(QWidget *parent = nullptr);
     ~OpenGLWidget() override;
+public slots:
+    void widgetUpdate();
 
 };
 

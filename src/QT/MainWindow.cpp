@@ -53,6 +53,7 @@ void MainWindow::constructToolbar(){
     toolBar->addAction(flag);
     toolBar->addAction(mapFix);
 
+    // To Do : fix selectMainWidget function
     connect(viewer, &QAction::triggered, this, [this]() {selectMainWidget(0);});
     connect(flag, &QAction::triggered, this, [this]() {selectMainWidget(1);});
     connect(mapFix, &QAction::triggered, this, [this]() {selectMainWidget(2);});
@@ -61,20 +62,8 @@ void MainWindow::constructToolbar(){
 }
 
 void MainWindow::constructMainWidget() {
-
-    mStackedWidget = new QStackedWidget(this);
-
-    QWidget* cameraView = new OpenGLWidget(this);
-    QWidget* pathSelection = new OpenGLWidget(this);
-    QWidget* mapFix = new OpenGLWidget(this);
-
-    mStackedWidget->addWidget(cameraView);
-    mStackedWidget->addWidget(pathSelection);
-    mStackedWidget->addWidget(mapFix);
-
-    mStackedWidget->setCurrentIndex(0);
-
-    this->setCentralWidget(mStackedWidget);
+    mainWidget = new OpenGLWidget(this);
+    this->setCentralWidget(mainWidget);
 }
 
 void MainWindow::setFullDisplay() {
@@ -87,7 +76,5 @@ void MainWindow::setFullDisplay() {
 }
 
 void MainWindow::selectMainWidget(int index) {
-    if (index >= 0 && index < mStackedWidget->count()) {
-        mStackedWidget->setCurrentIndex(index);
-    }
+    // To do : select renderer
 }

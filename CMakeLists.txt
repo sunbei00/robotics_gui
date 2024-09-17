@@ -27,15 +27,13 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 
-# Qt 경로 설정
-# To Do : relative path
-set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Qt6/lib/cmake/Qt6;${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Qt6/lib/cmake")
+
+# Qt
+set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Qt6/lib/cmake/Qt6;${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Qt6/lib/cmake;${CMAKE_PREFIX_PATH}")
 find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui OpenGL OpenGLWidgets)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
-
-# find_package(OpenGL REQUIRED)
 
 FILE(GLOB SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
@@ -43,7 +41,6 @@ FILE(GLOB SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/ROS2/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Graphics/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/*.cpp"
-
 )
 
 FILE(GLOB MOC_HEADERS
@@ -71,7 +68,6 @@ target_link_libraries(gui
         Qt6::OpenGL
         Qt6::Core
         Qt6::Gui
-        #OpenGL::GL
 )
 
 target_include_directories(gui PRIVATE ${HEADERS})
