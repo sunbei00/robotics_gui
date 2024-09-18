@@ -25,7 +25,6 @@ private: // ros
 private: // qt
     OpenGLWidget* mainWidget;
     QDockWidget* dockWidget;
-
 private: // method
     void constructMenubar();
     void constructMainWidget();
@@ -36,16 +35,20 @@ private: // method
 private slots: // slot
     void selectOption(int index);
     void loadPCDFile();
-
+public slots:
+    void setRobotTrackingMode(bool isTracking);
 signals:
     void robotMoved(glm::vec3 movement);
 
 public: // robot info
+    // To do : add mutex?? -> value is set by QNode. QNode is single thread. is it okay?
+    // add mutex to Camera??? -> but event driven. is it okay? -> need to check.
+    bool mIsRobotTracking = false;
     Robot robot;
 public:
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override = default;
-    void cameraTracking(Robot prev, Robot current);
+    void robotTracking(Robot prev, Robot current);
 };
 
 

@@ -114,7 +114,7 @@ void MainWindow::constructDockWidget() {
 
     QStackedWidget *stackedWidget = new QStackedWidget(dockWidget);
 
-    QWidget *page1 = new ViewOption(stackedWidget);
+    QWidget *page1 = new ViewOption(this, stackedWidget);
     QWidget *page2 = new QWidget(stackedWidget);
 
     stackedWidget->addWidget(page1);
@@ -123,17 +123,22 @@ void MainWindow::constructDockWidget() {
     addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 }
 
-void MainWindow::cameraTracking(Robot prev, Robot current) {
+void MainWindow::robotTracking(Robot prev, Robot current) {
     assert(mainWidget != nullptr);
     if(mainWidget == nullptr)
         return;
 
-    static bool isFirst=true;
+    static bool isFirst = true;
     if(isFirst){
         connect(this, &MainWindow::robotMoved, mainWidget, &OpenGLWidget::moveCamera);
         isFirst = false;
     }
 
     glm::vec3 movement = current.position - prev.position;
-    emit robotMoved(movement);
+    if(mIsRobotTracking)
+        emit robotMoved(movement);
+}
+
+void MainWindow::setRobotTrackingMode(bool isTracking) {
+    mIsRobotTracking = isTracking;
 }

@@ -6,14 +6,17 @@
 #define ROBOTICS_GUI_OPTIONWIDGET_H
 #include <QWidget>
 
+class MainWindow;
+
 class ViewOption : public QWidget{
     Q_OBJECT
 private:
-
+    MainWindow* mMainWindow;
 protected:
     QLayout* constructZFilter();
+    QWidget* constructRobotTracking();
 public:
-    explicit ViewOption(QWidget* parent = nullptr);
+    explicit ViewOption(MainWindow* mainWindow, QWidget* parent = nullptr);
     virtual ~ViewOption();
 
 };

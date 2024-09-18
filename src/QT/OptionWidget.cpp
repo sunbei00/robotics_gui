@@ -5,14 +5,30 @@
 #include <QVBoxLayout>
 #include <QSlider>
 #include <QLabel>
-
+#include <QCheckBox>
 
 #include "QT/OptionWidget.h"
+#include "QT/MainWindow.h"
 #include "Graphics/IGraphicalBase.h"
 
-ViewOption::ViewOption(QWidget *parent) : QWidget(parent){
+ViewOption::ViewOption(MainWindow* mainWindow, QWidget *parent) : QWidget(parent), mMainWindow(mainWindow){
+    assert(mMainWindow != nullptr);
 
-    setLayout(constructZFilter());
+    QVBoxLayout* All = new QVBoxLayout();
+
+    QWidget* zFilterWidget = new QWidget(this);
+    QLayout* zFilterLayout = constructZFilter();
+    zFilterWidget->setLayout(zFilterLayout);
+
+    All->addWidget(zFilterWidget);
+
+
+    QWidget* trackingWidget = constructRobotTracking();
+    All->addWidget(trackingWidget);
+
+    All->addStretch();
+
+    setLayout(All);
 }
 
 QLayout *ViewOption::constructZFilter() {
@@ -62,7 +78,6 @@ QLayout *ViewOption::constructZFilter() {
     layout->addWidget(maxDoubleSpinBox);
     layout->addWidget(maxSlider);
 
-    layout->addStretch();
 
     connect(minDoubleSpinBox, &QDoubleSpinBox::valueChanged, [=](float value) {
         auto& min = Graphics::ZFilter::mZMin;
@@ -97,6 +112,24 @@ QLayout *ViewOption::constructZFilter() {
     });
 
     return layout;
+}
+
+QWidget* ViewOption::constructRobotTracking() {
+    QWidget* robotTrackingWidget = new QWidget(this);
+    QHBoxLayout* robotTrackingLayout = new QHBoxLayout();
+    robotTrackingWidget->setLayout(robotTrackingLayout);
+
+    QLabel* trackingLabel = new QLabel("Tracking Mode: ", robotTrackingWidget);
+    QCheckBox* trackingMode = new QCheckBox(robotTrackingWidget);
+    if(mMainWindow->mIsRobotTracking)
+        trackingMode->setCheckState(Qt::CheckState::Checked);
+    else
+        trackingMode->setCheckState(Qt::CheckState::Unchecked);
+    connect(trackingMode, &QCheckBox::toggled, mMainWindow, &MainWindow::setRobotTrackingMode);
+    robotTrackingLayout->addWidget(trackingLabel);
+    robotTrackingLayout->addWidget(trackingMode);
+
+    return robotTrackingWidget;
 }
 
 ViewOption::~ViewOption() = default;

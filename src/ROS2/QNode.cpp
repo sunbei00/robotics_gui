@@ -25,7 +25,7 @@ void QNode::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
         prev_robot = mMainWindow->robot;
         isFirst = false;
     }
-    mMainWindow->cameraTracking(prev_robot, mMainWindow->robot);
+    mMainWindow->robotTracking(prev_robot, mMainWindow->robot);
 }
 
 void QNode::pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg)
@@ -35,8 +35,10 @@ void QNode::pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
 }
 
 QNode::QNode(QObject* parent) : QThread(parent){
-    if(parent != nullptr)
-       mMainWindow = dynamic_cast<MainWindow*>(parent);
+    if(parent != nullptr){
+        mMainWindow = dynamic_cast<MainWindow*>(parent);
+        assert(mMainWindow != nullptr);
+    }
     else
         mMainWindow = nullptr;
 
