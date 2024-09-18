@@ -10,11 +10,12 @@ void QNode::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
     assert(mMainWindow != nullptr);
     if (mMainWindow == nullptr)
         return;
-
     auto& positionMsg = msg->pose.pose.position;
     auto& orientationMsg = msg->pose.pose.orientation;
-    glm::vec3 curr_position(positionMsg.x, positionMsg.y, positionMsg.z);
-    glm::quat curr_orientation(orientationMsg.w, orientationMsg.x, orientationMsg.y, orientationMsg.z);
+
+    // SLAM to OpenGL coordinates
+    glm::vec3 curr_position(positionMsg.x, positionMsg.z, positionMsg.y);
+    glm::quat curr_orientation(orientationMsg.w, orientationMsg.x, orientationMsg.z, orientationMsg.y);
 
     Robot prev_robot = mMainWindow->robot;
     mMainWindow->robot.position = curr_position;
@@ -48,11 +49,14 @@ QNode::QNode(QObject* parent) : QThread(parent){
 
     node = std::make_shared<rclcpp::Node>("robotics_gui");
 
+    rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+    qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
+
     odom_subscription_ = node->create_subscription<nav_msgs::msg::Odometry>(
-            "odom", 10, std::bind(&QNode::odom_callback, this, std::placeholders::_1));
+            "lio_sam/mapping/odometry", qos, std::bind(&QNode::odom_callback, this, std::placeholders::_1));
 
     pointcloud_subscription_ = node->create_subscription<sensor_msgs::msg::PointCloud2>(
-            "pointcloud", 10, std::bind(&QNode::pointcloud_callback, this, std::placeholders::_1));
+            "pointcloud", qos, std::bind(&QNode::pointcloud_callback, this, std::placeholders::_1));
 
 }
 
