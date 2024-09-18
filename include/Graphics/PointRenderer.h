@@ -36,7 +36,7 @@ namespace Graphics{
         void genGL() override;
         void delGL() override;
     protected:
-        GLuint vao;
+        GLuint vao = 0;
         std::vector<GLuint> vbo;
 
         pcd_data mData;
@@ -50,6 +50,28 @@ namespace Graphics{
 }
 
 namespace Graphics{
+    class PointRendererSeparatedFiltered : public IPointRenderer{
+    private:
+        static GLuint mProgram;
+    protected:
+        GLuint getProgram() override;
+        void genGL() override;
+        void delGL() override;
+    protected:
+        GLuint vao = 0;
+        std::vector<GLuint> vbo;
+        pcd_data mData;
+
+    public:
+        explicit PointRendererSeparatedFiltered(QOpenGLFunctions_4_5_Core* glFunc, const pcd_data& data);
+        explicit PointRendererSeparatedFiltered(QOpenGLFunctions_4_5_Core* glFunc, pcd_data&& data);
+        ~PointRendererSeparatedFiltered() override;
+        void draw(glm::mat4 viewMatrix = glm::mat4(1.f), glm::mat4 projectionMatrix = glm::mat4(1.f)) override;
+    };
+}
+
+namespace Graphics{
+    // To do : Test Code, Only Implementation
     class PointRendererInterleaved : public IPointRenderer{
     private:
         static GLuint mProgram;
@@ -58,10 +80,13 @@ namespace Graphics{
         void genGL() override;
         void delGL() override;
     protected:
-        GLuint vao;
-        GLuint vbo;
+        GLuint vao = 0;
+        GLuint vbo = 0;
+
+        std::vector<glm::vec3> mData;
     public:
-        explicit PointRendererInterleaved(QOpenGLFunctions_4_5_Core* glFunc);
+        explicit PointRendererInterleaved(QOpenGLFunctions_4_5_Core* glFunc, const std::vector<glm::vec3>& data);
+        explicit PointRendererInterleaved(QOpenGLFunctions_4_5_Core* glFunc, std::vector<glm::vec3>&& data);
         ~PointRendererInterleaved() override;
         void draw(glm::mat4 viewMatrix = glm::mat4(1.f), glm::mat4 projectionMatrix = glm::mat4(1.f)) override;
     };

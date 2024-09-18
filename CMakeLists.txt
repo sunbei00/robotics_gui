@@ -26,6 +26,8 @@ endif()
 # ROS2
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 
 # Qt
@@ -60,17 +62,28 @@ set(RESOURCES
 
 add_executable(gui ${SOURCES} ${MOC_HEADERS} ${RESOURCES})
 
-ament_target_dependencies(gui rclcpp)
+# OpenMP
+find_package(OpenMP REQUIRED)
+if(OpenMP_CXX_FOUND)
+    target_compile_options(gui PRIVATE ${OpenMP_CXX_FLAGS})
+    set(OPENMP_LIBRARY ${OpenMP_CXX_LIBRARIES})
+else()
+    set(OPENMP_LIBRARY)
+endif ()
 
+
+target_include_directories(gui PRIVATE ${HEADERS})
 target_link_libraries(gui
         Qt6::OpenGLWidgets
         Qt6::Widgets
         Qt6::OpenGL
         Qt6::Core
         Qt6::Gui
+        ${OPENMP_LIBRARY}
 )
 
-target_include_directories(gui PRIVATE ${HEADERS})
+
+ament_target_dependencies(gui rclcpp nav_msgs sensor_msgs)
 
 install(TARGETS
         gui

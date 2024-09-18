@@ -7,6 +7,18 @@
 #include <QOpenGLFunctions_4_5_Core>
 #include "glm.hpp"
 
+
+namespace Graphics{
+    class ZFilter{
+    public:
+        static float mZMin;
+        static float mZMax;
+
+        static float mLimitZMin;
+        static float mLimitZMax;
+    };
+}
+
 namespace Graphics{
     void checkOpenGLError(const std::string &functionName);
 

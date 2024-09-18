@@ -7,15 +7,22 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_4_5_Core>
 #include <QTimer>
-#include "Graphics/PointRenderer.h"
+#include "Graphics/IGraphicalBase.h"
 #include "Graphics/Camera.h"
 
-class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_5_Core
+namespace DATA{
+    enum class GET_DATA_METHOD{ROS, PCD};
+
+    struct Field{
+        unsigned int time;
+        GET_DATA_METHOD method;
+    };
+}
+
+class OpenGLWidget : public QOpenGLWidget, public QOpenGLFunctions_4_5_Core
 {
 Q_OBJECT
 
-private: // tmp test
-    Graphics::IPointRenderer* pointRenderer = nullptr;
 protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
@@ -28,11 +35,16 @@ protected:
 protected:
     Graphics::InteractionCamera mCamera;
     QTimer* timer;
+    std::vector<std::pair<DATA::Field, Graphics::IGraphicalBase*>> mRenderer;
 public:
     explicit OpenGLWidget(QWidget *parent = nullptr);
     ~OpenGLWidget() override;
+
+    void addRenderer(DATA::Field field, Graphics::IGraphicalBase* renderer);
+
 public slots:
     void widgetUpdate();
+    void moveCamera(glm::vec3 movement);
 
 };
 

@@ -7,6 +7,14 @@
 #include <iostream>
 
 namespace Graphics{
+    float ZFilter::mZMin = -30;
+    float ZFilter::mZMax = 100;
+
+    float ZFilter::mLimitZMin = -30;
+    float ZFilter::mLimitZMax = 100;
+}
+
+namespace Graphics{
 
     void checkOpenGLError(const std::string &functionName) {
         GLenum error;
@@ -33,9 +41,7 @@ namespace Graphics{
         }
     }
 
-    IGraphicalBase::IGraphicalBase(QOpenGLFunctions_4_5_Core *glFunction) {
-        glFunc = glFunction;
-    }
+    IGraphicalBase::IGraphicalBase(QOpenGLFunctions_4_5_Core *glFunction) : glFunc(glFunction) {}
 
     IGraphicalBase::~IGraphicalBase() = default;
 

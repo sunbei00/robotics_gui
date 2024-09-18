@@ -19,7 +19,7 @@ namespace Graphics{
         glm::vec3 eye;
         glm::vec3 cen;
         glm::vec3 up;
-        glm::vec2 rect;
+        glm::vec2 rect; // width, height
     };
 
     class InteractionCamera {
@@ -39,6 +39,7 @@ namespace Graphics{
         void mouseReleased();
         void mouseMoved(glm::vec2 mousePos);
         void mouseWheel(float wheel);
+        void move(glm::vec3 movement);
 
         glm::mat4 getViewMatrix();
         glm::mat4 getPerspectiveMatrix();

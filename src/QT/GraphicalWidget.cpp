@@ -8,15 +8,22 @@
 #include <glm.hpp>
 #include <QMouseEvent>
 
+#include "Graphics/PointRenderer.h"
+
 OpenGLWidget::OpenGLWidget(QWidget *parent)
         : QOpenGLWidget(parent) {
 
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &OpenGLWidget::widgetUpdate);
-    timer->start(16);
+    timer->start(16); // 60 fps
 }
 
 OpenGLWidget::~OpenGLWidget() {
+    timer->stop();
+    delete timer;
+
+    for(auto& it : mRenderer)
+        delete it.second;
 }
 
 void OpenGLWidget::initializeGL() {
@@ -26,14 +33,6 @@ void OpenGLWidget::initializeGL() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.188235294, 0.188235294, 0.188235294, 1.0f);
-
-    std::map<std::string, std::vector<float>> data;
-    Utils::loadPCD("/root/share/code/PathSamplingGUI/dataset/GlobalMap.pcd", data);
-    pointRenderer = new Graphics::PointRendererSeparated(this, data);
-
-
-
-
 }
 
 void OpenGLWidget::resizeGL(int w, int h) {
@@ -44,12 +43,14 @@ void OpenGLWidget::resizeGL(int w, int h) {
 void OpenGLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    pointRenderer->draw(mCamera.getViewMatrix(), mCamera.getPerspectiveMatrix());
+    for(auto& it : mRenderer){
+        it.second->draw(mCamera.getViewMatrix(), mCamera.getPerspectiveMatrix());
+    }
 }
 
 void OpenGLWidget::mousePressEvent(QMouseEvent* event) {
     mCamera.mousePressed(event->button() == Qt::LeftButton, event->button() == Qt::RightButton,
-                         { event->pos().x(),  event->pos().y()});
+                     { event->pos().x(),  event->pos().y()});
 }
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent* event) {
@@ -67,3 +68,12 @@ void OpenGLWidget::wheelEvent(QWheelEvent* event){
 void OpenGLWidget::widgetUpdate() {
     update();
 }
+
+void OpenGLWidget::addRenderer(DATA::Field field, Graphics::IGraphicalBase* renderer) {
+    mRenderer.push_back({field, renderer});
+}
+
+void OpenGLWidget::moveCamera(glm::vec3 movement) {
+    mCamera.move(movement);
+}
+

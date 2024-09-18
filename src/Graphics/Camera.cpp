@@ -68,11 +68,16 @@ namespace Graphics {
     }
 
     InteractionCamera::InteractionCamera() : mMouseState(MOUSE_STATE::IDLE),
-                                            mCamera({ { 0,0, 30 }, { 0,0,0 }, { 0,1,0 }, {1920, 1080} }){
+                                            mCamera({ { 0, 10, 30 }, { 0,0,0 }, { 0,1,0 }, {1920, 1080} }){
 
     }
 
     void InteractionCamera::setWH(glm::vec2 wh) {
         mCamera.rect = wh;
+    }
+
+    void InteractionCamera::move(glm::vec3 movement) {
+        mCamera.cen += movement;
+        mCamera.eye += movement;
     }
 }
