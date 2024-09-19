@@ -2,7 +2,7 @@
 // Created by root on 9/12/24.
 //
 
-#include "QT/GraphicalWidget.h"
+#include "QT/GraphicWidget.h"
 #include "Utils/LoadPCD.h"
 
 #include <glm.hpp>

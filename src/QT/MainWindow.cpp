@@ -8,7 +8,7 @@
 #include <QScreen>
 
 #include "QT/MainWindow.h"
-#include "QT/GraphicalWidget.h"
+#include "QT/GraphicWidget.h"
 #include "Utils/LoadPCD.h"
 #include "Graphics/PointRenderer.h"
 #include "QT/OptionWidget.h"
@@ -132,7 +132,7 @@ void MainWindow::addPointCloudRenderer(const std::vector<glm::vec3>& point_cloud
     assert(mainWidget != nullptr);
 
     DATA::Field field(0, DATA::GET_DATA_METHOD::ROS, DATA::DATA_TYPE::POINT_CLOUD);
-    mainWidget->makeCurrent();
+    mainWidget->makeCurrent(); // To do : delete this
     mainWidget->addRenderer(field, new Graphics::PointRendererInterleavedFiltered(mainWidget, point_cloud));
     mainWidget->doneCurrent();
 

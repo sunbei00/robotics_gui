@@ -6,7 +6,7 @@
 #define ROBOTICS_GUI_MAINWINDOW_H
 #include <QMainWindow>
 #include "ROS2/QNode.h"
-#include "QT/GraphicalWidget.h"
+#include "QT/GraphicWidget.h"
 
 
 class MainWindow : public QMainWindow{
