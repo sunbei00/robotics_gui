@@ -92,4 +92,26 @@ namespace Graphics{
     };
 }
 
+namespace Graphics{
+    // To do : Test Code, Only Implementation
+    class PointRendererInterleavedFiltered : public IPointRenderer{
+    private:
+        static GLuint mProgram;
+    protected:
+        GLuint getProgram() override;
+        void genGL() override;
+        void delGL() override;
+    protected:
+        GLuint vao = 0;
+        GLuint vbo = 0;
+
+        std::vector<glm::vec3> mData;
+    public:
+        explicit PointRendererInterleavedFiltered(QOpenGLFunctions_4_5_Core* glFunc, const std::vector<glm::vec3>& data);
+        explicit PointRendererInterleavedFiltered(QOpenGLFunctions_4_5_Core* glFunc, std::vector<glm::vec3>&& data);
+        ~PointRendererInterleavedFiltered() override;
+        void draw(glm::mat4 viewMatrix = glm::mat4(1.f), glm::mat4 projectionMatrix = glm::mat4(1.f)) override;
+    };
+}
+
 #endif //ROBOTICS_GUI_POINTRENDERER_H

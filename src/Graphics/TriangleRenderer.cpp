@@ -5,35 +5,6 @@
 
 #include "Graphics/TriangleRenderer.h"
 
-const char* triangleVertexShaderSource = R"glsl(
-#version 330 core
-layout(location = 0) in vec3 aPos;
-layout(location = 1) in vec3 aColor;
-
-out vec3 ourColor;
-
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-
-void main()
-{
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
-    ourColor = aColor;
-}
-)glsl";
-
-const char* triangleFragmentShaderSource = R"glsl(
-#version 330 core
-out vec4 FragColor;
-
-in vec3 ourColor;
-
-void main()
-{
-    FragColor = vec4(ourColor, 1.0);
-}
-)glsl";
 
 namespace Graphics{
 
@@ -73,8 +44,8 @@ namespace Graphics{
 
     GLuint TriangleRenderer::getProgram() {
         if(mProgram == 0){
-            vertexShaderSource = triangleVertexShaderSource;
-            fragmentShaderSource = triangleFragmentShaderSource;
+            vertexShaderSource = Utils::readGLSLFile(shaderPath + "/triangleVertexShaderSource.glsl");
+            fragmentShaderSource = Utils::readGLSLFile(shaderPath + "/triangleFragmentShaderSource.glsl");
             mProgram = compileProgram();
         }
         return mProgram;

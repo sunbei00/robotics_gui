@@ -6,6 +6,7 @@
 #include "gtc/type_ptr.hpp"
 #include <iostream>
 
+
 namespace Graphics{
     float ZFilter::mZMin = -30;
     float ZFilter::mZMax = 100;
@@ -16,30 +17,8 @@ namespace Graphics{
 
 namespace Graphics{
 
-    void checkOpenGLError(const std::string &functionName) {
-        GLenum error;
-        while ((error = glGetError()) != GL_NO_ERROR) {
-            std::string errorMessage;
-            switch (error) {
-                case GL_INVALID_OPERATION:
-                    errorMessage = "Invalid operation";
-                    break;
-                case GL_INVALID_VALUE:
-                    errorMessage = "Invalid value";
-                    break;
-                case GL_INVALID_ENUM:
-                    errorMessage = "Invalid enum";
-                    break;
-                case GL_OUT_OF_MEMORY:
-                    errorMessage = "Out of memory";
-                    break;
-                default:
-                    errorMessage = "Unknown error";
-                    break;
-            }
-            std::cerr << "OpenGL Error in " << functionName << ": " << errorMessage << std::endl;
-        }
-    }
+
+    std::string IGraphicalBase::shaderPath = std::string(SHADER_DIR);
 
     IGraphicalBase::IGraphicalBase(QOpenGLFunctions_4_5_Core *glFunction) : glFunc(glFunction) {}
 
@@ -61,8 +40,8 @@ namespace Graphics{
     }
 
     GLuint IGraphicalBase::compileProgram(){
-        GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
-        GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+        GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource.c_str());
+        GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource.c_str());
 
         GLuint shaderProgram = glFunc->glCreateProgram();
         glFunc->glAttachShader(shaderProgram, vertexShader);

@@ -26,6 +26,9 @@ private:
 private:
     void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg);
     void pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg);
+
+signals:
+    void receivePointCloud(const std::vector<glm::vec3>& point_cloud);
 public:
     QNode(QObject* parent = nullptr);
     ~QNode() override = default;

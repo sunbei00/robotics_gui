@@ -11,7 +11,7 @@
 #include "Graphics/PointRenderer.h"
 
 OpenGLWidget::OpenGLWidget(QWidget *parent)
-        : QOpenGLWidget(parent) {
+        : QOpenGLWidget(parent), mCamera(true) {
 
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &OpenGLWidget::widgetUpdate);

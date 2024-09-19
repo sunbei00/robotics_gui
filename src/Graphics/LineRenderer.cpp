@@ -4,32 +4,6 @@
 
 #include "Graphics/LineRenderer.h"
 
-const char* lineVertexShaderSource = R"glsl(
-#version 330 core
-layout(location = 0) in vec3 aPos;
-
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-
-void main()
-{
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
-}
-)glsl";
-
-const char* lineFragmentShaderSource = R"glsl(
-#version 330 core
-out vec4 FragColor;
-
-uniform vec3 lineColor;
-
-void main()
-{
-    FragColor = vec4(lineColor, 1.0);
-}
-)glsl";
-
 namespace Graphics{
 
     GLuint LineRenderer::mProgram = 0;
@@ -68,8 +42,8 @@ namespace Graphics{
 
     GLuint LineRenderer::getProgram() {
         if(mProgram == 0){
-            vertexShaderSource = lineVertexShaderSource;
-            fragmentShaderSource = lineFragmentShaderSource;
+            vertexShaderSource = Utils::readGLSLFile(shaderPath + "/lineVertexShaderSource.glsl");
+            fragmentShaderSource = Utils::readGLSLFile(shaderPath + "/lineFragmentShaderSource.glsl");
             mProgram = compileProgram();
         }
         return mProgram;

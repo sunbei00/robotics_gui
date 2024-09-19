@@ -37,6 +37,7 @@ private slots: // slot
     void loadPCDFile();
 public slots:
     void setRobotTrackingMode(bool isTracking);
+    void addRenderer2MainWidget(const std::vector<glm::vec3>& point_cloud);
 signals:
     void robotMoved(glm::vec3 movement);
 

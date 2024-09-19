@@ -30,8 +30,9 @@ namespace Graphics{
         MOUSE_STATE mMouseState;
         glm::vec2 mMousePos;
         Camera mCamera;
+        bool mIsRobotics;
     public:
-        InteractionCamera();
+        InteractionCamera(bool isRobotics=false);
         void setMouseMode(MOUSE_STATE mouseState);
         void setCamera(glm::vec3 eye, glm::vec3 cen, glm::vec3 up);
         void setWH(glm::vec2 wh);

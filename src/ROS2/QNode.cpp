@@ -13,9 +13,9 @@ void QNode::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
     auto& positionMsg = msg->pose.pose.position;
     auto& orientationMsg = msg->pose.pose.orientation;
 
-    // SLAM to OpenGL coordinates
+    // SLAM to OpenGL coordinates (exchange Y-axis ans Z-axis)
     glm::vec3 curr_position(positionMsg.x, positionMsg.z, positionMsg.y);
-    glm::quat curr_orientation(orientationMsg.w, orientationMsg.x, orientationMsg.z, orientationMsg.y);
+    glm::quat curr_orientation(orientationMsg.w, orientationMsg.x, orientationMsg.y, orientationMsg.z);
 
     Robot prev_robot = mMainWindow->robot;
     mMainWindow->robot.position = curr_position;
@@ -31,8 +31,45 @@ void QNode::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
 
 void QNode::pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg)
 {
-    RCLCPP_INFO(node->get_logger(), "Received point cloud data, width: %u, height: %u",
-                msg->width, msg->height);
+    std::vector<glm::vec3> cloud_points;
+
+    const uint32_t point_step = msg->point_step;
+    const auto data = msg->data.data();
+
+    int x_offset = -1, y_offset = -1, z_offset = -1;
+
+    for (const auto& field : msg->fields) {
+        if (field.name == "x") x_offset = field.offset;
+        if (field.name == "y") y_offset = field.offset;
+        if (field.name == "z") z_offset = field.offset;
+    }
+
+    if (x_offset == -1 || y_offset == -1 || z_offset == -1) {
+        RCLCPP_ERROR(node->get_logger(), "Invalid point cloud data format.");
+        return;
+    }
+
+    for (uint32_t i = 0; i < msg->width * msg->height; ++i) {
+        const uint8_t* point_ptr = data + i * point_step;
+
+        float x = *reinterpret_cast<const float*>(point_ptr + x_offset);
+        float y = *reinterpret_cast<const float*>(point_ptr + y_offset);
+        float z = *reinterpret_cast<const float*>(point_ptr + z_offset);
+
+
+        cloud_points.emplace_back(x, y, z);
+    }
+
+    assert(mMainWindow != nullptr);
+    static bool isFirst = true;
+    if(isFirst){
+        connect(this, &QNode::receivePointCloud, mMainWindow, &MainWindow::addRenderer2MainWidget);
+        isFirst = false;
+    }
+
+    emit receivePointCloud(cloud_points);
+
+    //RCLCPP_INFO(node->get_logger(), "Extracted %zu points", cloud_points.size());
 }
 
 QNode::QNode(QObject* parent) : QThread(parent){
@@ -56,7 +93,7 @@ QNode::QNode(QObject* parent) : QThread(parent){
             "lio_sam/mapping/odometry", qos, std::bind(&QNode::odom_callback, this, std::placeholders::_1));
 
     pointcloud_subscription_ = node->create_subscription<sensor_msgs::msg::PointCloud2>(
-            "pointcloud", qos, std::bind(&QNode::pointcloud_callback, this, std::placeholders::_1));
+            "lio_sam/mapping/cloud_registered", qos, std::bind(&QNode::pointcloud_callback, this, std::placeholders::_1));
 
 }
 

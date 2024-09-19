@@ -38,11 +38,11 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 FILE(GLOB SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/QT/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/ROS2/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Graphics/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/*.cpp"
 )
 
 FILE(GLOB MOC_HEADERS
@@ -89,6 +89,20 @@ install(TARGETS
         gui
         DESTINATION lib/${PROJECT_NAME}
 )
+
+
+# below option is for ROS
+# CLION is not installing. so, currently use fixed shader path
+#install(
+#        DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shader/
+#        DESTINATION lib/${PROJECT_NAME}/shader/
+#)
+# add_definitions(-DSHADER_DIR="${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}/shader")
+
+# below option is for CLion and ROS. but ROS is limited.
+# program source code path is fixed by shader path
+# CLION is not installing. so, currently use fixed shader path
+add_definitions(-DSHADER_DIR="${CMAKE_CURRENT_SOURCE_DIR}/shader")
 
 
 ament_package()

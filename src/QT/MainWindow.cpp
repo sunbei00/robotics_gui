@@ -142,3 +142,13 @@ void MainWindow::robotTracking(Robot prev, Robot current) {
 void MainWindow::setRobotTrackingMode(bool isTracking) {
     mIsRobotTracking = isTracking;
 }
+
+void MainWindow::addRenderer2MainWidget(const std::vector<glm::vec3>& point_cloud ) {
+    assert(mainWidget != nullptr);
+
+    DATA::Field field {0, DATA::GET_DATA_METHOD::ROS};
+    mainWidget->makeCurrent();
+    mainWidget->addRenderer(field, new Graphics::PointRendererInterleavedFiltered(mainWidget, point_cloud));
+    mainWidget->doneCurrent();
+
+}

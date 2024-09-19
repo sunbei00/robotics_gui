@@ -3,7 +3,7 @@
 //
 #include "Graphics/Camera.h"
 #include <gtc/matrix_transform.hpp>
-
+#include <algorithm>
 #include <iostream>
 
 namespace Graphics {
@@ -67,8 +67,12 @@ namespace Graphics {
         return glm::perspective(glm::radians(60.0f), (float)mCamera.rect.x / (float)mCamera.rect.y, 0.01f, 1000.0f);
     }
 
-    InteractionCamera::InteractionCamera() : mMouseState(MOUSE_STATE::IDLE),
-                                            mCamera({ { 0, 10, 30 }, { 0,0,0 }, { 0,1,0 }, {1920, 1080} }){
+    InteractionCamera::InteractionCamera(bool isRobotics) : mMouseState(MOUSE_STATE::IDLE), mIsRobotics(isRobotics){
+
+        if(mIsRobotics)
+            mCamera = { { 0, 30, 10 }, { 0,0,0 }, { 0,0,1 }, {1920, 1080} };
+        else
+            mCamera = { { 0, 10, 30 }, { 0,0,0 }, { 0,1,0 }, {1920, 1080} };
 
     }
 
@@ -77,6 +81,9 @@ namespace Graphics {
     }
 
     void InteractionCamera::move(glm::vec3 movement) {
+        if(mIsRobotics)
+            std::swap(movement.y, movement.z);
+
         mCamera.cen += movement;
         mCamera.eye += movement;
     }

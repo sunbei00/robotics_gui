@@ -5,8 +5,12 @@
 #ifndef ROBOTICS_GUI_IGRAPHICALBASE_H
 #define ROBOTICS_GUI_IGRAPHICALBASE_H
 #include <QOpenGLFunctions_4_5_Core>
+#include "Utils/LoadGLSL.h"
 #include "glm.hpp"
 
+
+namespace Graphics{
+}
 
 namespace Graphics{
     class ZFilter{
@@ -20,10 +24,8 @@ namespace Graphics{
 }
 
 namespace Graphics{
-    void checkOpenGLError(const std::string &functionName);
 
     class IGraphicalBase{
-    private:
     protected:
         virtual void genGL() = 0;
         virtual void delGL() = 0;
@@ -33,9 +35,11 @@ namespace Graphics{
         virtual GLuint getProgram() = 0;
     protected:
         QOpenGLFunctions_4_5_Core* glFunc;
-        const char* vertexShaderSource = nullptr;
-        const char* fragmentShaderSource = nullptr;
+        std::string vertexShaderSource;
+        std::string fragmentShaderSource;
         glm::mat4 modelMatrix = glm::mat4(1.f);
+
+        static std::string shaderPath;
     public:
         explicit IGraphicalBase(QOpenGLFunctions_4_5_Core* glFunction);
         virtual ~IGraphicalBase();
