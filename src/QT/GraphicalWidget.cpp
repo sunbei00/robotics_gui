@@ -95,6 +95,3 @@ void OpenGLWidget::moveRobot(Robot current) {
     mRobotRenderer.second->modelMatrix = glm::translate(glm::mat4(1.0f), current.position) * glm::mat4_cast(current.orientation) * modelRotate;
 }
 
-DATA::Field::Field(unsigned int time, GET_DATA_METHOD method, DATA_TYPE type) : mTime(time), mMethod(method), mType(type){}
-
-

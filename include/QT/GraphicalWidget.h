@@ -10,19 +10,7 @@
 #include "Graphics/IGraphicalBase.h"
 #include "Graphics/Camera.h"
 #include "Definition/Robot.h"
-
-namespace DATA{
-    enum class GET_DATA_METHOD{ROS, PCD, OBJ, NONE};
-    enum class DATA_TYPE{POINT_CLOUD, MESH, ROBOT, NONE};
-
-    struct Field{
-        unsigned int mTime;
-        GET_DATA_METHOD mMethod;
-        DATA_TYPE mType;
-
-        Field(unsigned int time=0, GET_DATA_METHOD method = GET_DATA_METHOD::NONE, DATA_TYPE type = DATA_TYPE::NONE);
-    };
-}
+#include "Definition/Data.h"
 
 class OpenGLWidget : public QOpenGLWidget, public QOpenGLFunctions_4_5_Core
 {
