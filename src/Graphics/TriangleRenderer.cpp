@@ -10,55 +10,6 @@
 
 namespace Graphics{
 
-    GLuint TriangleRenderer::mProgram = 0;
-
-    TriangleRenderer::TriangleRenderer(QOpenGLFunctions_4_5_Core *glFunc) : IGraphicalBase(glFunc){
-        genGL();
-    }
-
-    TriangleRenderer::~TriangleRenderer(){
-        delGL();
-    }
-
-    void TriangleRenderer::delGL(){
-        if(vao != 0)
-            glFunc->glDeleteVertexArrays(1, &vao);
-        if(vbo != 0)
-            glFunc->glDeleteBuffers(1, &vbo);
-        vao = 0;
-        vbo = 0;
-    }
-
-    void TriangleRenderer::genGL() {
-        delGL();
-        glFunc->glGenVertexArrays(1, &vao);
-        glFunc->glBindVertexArray(vao);
-        glFunc->glGenBuffers(1, &vbo);
-        glFunc->glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glFunc->glBindVertexArray(0);
-    }
-
-    void TriangleRenderer::draw(const InteractionCamera& camera) {
-        glFunc->glUseProgram(getProgram());
-        setMVPUniform(camera.getViewMatrix(), camera.getPerspectiveMatrix());
-
-    }
-
-    GLuint TriangleRenderer::getProgram() {
-        if(mProgram == 0){
-            vertexShaderSource = Utils::readGLSLFile(shaderPath + "/triangleVertexShaderSource.glsl");
-            fragmentShaderSource = Utils::readGLSLFile(shaderPath + "/triangleFragmentShaderSource.glsl");
-            mProgram = compileProgram();
-        }
-        return mProgram;
-    }
-}
-
-
-
-
-namespace Graphics{
-
     GLuint OBJLoaderTriangleRenderer::mProgram = 0;
 
     OBJLoaderTriangleRenderer::OBJLoaderTriangleRenderer(const std::string& objFilePath, QOpenGLFunctions_4_5_Core *glFunc) : IGraphicalBase(glFunc){

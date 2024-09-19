@@ -24,6 +24,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent){
     constructToolbar();
     constructMainWidget();
     constructDockWidget();
+
+    assert(mainWidget != nullptr);
+    connect(this, &MainWindow::robotMovedIncremental, mainWidget, &OpenGLWidget::moveCamera);
+    connect(this, &MainWindow::robotMoved, mainWidget, &OpenGLWidget::moveRobot);
 }
 
 void MainWindow::constructMenubar() {
@@ -129,26 +133,13 @@ void MainWindow::setRobotTrackingMode(bool isTracking) {
 }
 
 void MainWindow::addPointCloudRenderer(const std::vector<glm::vec3>& point_cloud ) {
-    assert(mainWidget != nullptr);
-
     DATA::Field field(0, DATA::GET_DATA_METHOD::ROS, DATA::DATA_TYPE::POINT_CLOUD);
     mainWidget->makeCurrent(); // To do : delete this
     mainWidget->addRenderer(field, new Graphics::PointRendererInterleavedFiltered(mainWidget, point_cloud));
     mainWidget->doneCurrent();
-
 }
 
 void MainWindow::setRobotPose(Robot current){
-    assert(mainWidget != nullptr);
-    if(mainWidget == nullptr)
-        return;
-
-    static bool isFirst = true;
-    if(isFirst){
-        connect(this, &MainWindow::robotMovedIncremental, mainWidget, &OpenGLWidget::moveCamera);
-        connect(this, &MainWindow::robotMoved, mainWidget, &OpenGLWidget::moveRobot);
-        isFirst = false;
-    }
     Robot prev = robot;
     glm::vec3 movement = current.position - prev.position;
     if(mIsRobotTracking)

@@ -17,16 +17,12 @@ void QNode::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
     curr_robot.position = glm::vec3(positionMsg.x, positionMsg.y, positionMsg.z);
     curr_robot.orientation = glm::quat(orientationMsg.w, orientationMsg.x, orientationMsg.y, orientationMsg.z);
 
-    static bool isFirst = true;
-    if(isFirst){
-        isFirst = false;
-        connect(this, &QNode::receiveRobotPose, mMainWindow, &MainWindow::setRobotPose);
-    }
     emit receiveRobotPose(curr_robot);
 }
 
 void QNode::pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg)
 {
+    assert(mMainWindow != nullptr);
     std::vector<glm::vec3> cloud_points;
 
     const uint32_t point_step = msg->point_step;
@@ -56,17 +52,7 @@ void QNode::pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
         cloud_points.emplace_back(x, y, z);
     }
 
-
-
-    assert(mMainWindow != nullptr);
-    static bool isFirst = true;
-    if(isFirst){
-        connect(this, &QNode::receivePointCloud, mMainWindow, &MainWindow::addPointCloudRenderer);
-        isFirst = false;
-    }
-
     emit receivePointCloud(cloud_points);
-
 
     //RCLCPP_INFO(node->get_logger(), "Extracted %zu points", cloud_points.size());
 }
@@ -93,6 +79,10 @@ QNode::QNode(QObject* parent) : QThread(parent){
 
     pointcloud_subscription_ = node->create_subscription<sensor_msgs::msg::PointCloud2>(
             "lio_sam/mapping/cloud_registered", qos, std::bind(&QNode::pointcloud_callback, this, std::placeholders::_1));
+
+
+    connect(this, &QNode::receivePointCloud, mMainWindow, &MainWindow::addPointCloudRenderer);
+    connect(this, &QNode::receiveRobotPose, mMainWindow, &MainWindow::setRobotPose);
 
 }
 
