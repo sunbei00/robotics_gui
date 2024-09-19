@@ -10,7 +10,7 @@
 
 #include "nav_msgs/msg/odometry.hpp"
 #include "sensor_msgs/msg/point_cloud2.hpp"
-#include "Graphics/Camera.h"
+#include "Definition/Robot.h"
 
 class MainWindow;
 
@@ -29,6 +29,9 @@ private:
 
 signals:
     void receivePointCloud(const std::vector<glm::vec3>& point_cloud);
+    void receiveRobotPose(Robot current);
+
+
 public:
     QNode(QObject* parent = nullptr);
     ~QNode() override = default;

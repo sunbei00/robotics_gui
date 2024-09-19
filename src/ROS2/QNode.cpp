@@ -13,20 +13,16 @@ void QNode::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
     auto& positionMsg = msg->pose.pose.position;
     auto& orientationMsg = msg->pose.pose.orientation;
 
-    // SLAM to OpenGL coordinates (exchange Y-axis ans Z-axis)
-    glm::vec3 curr_position(positionMsg.x, positionMsg.z, positionMsg.y);
-    glm::quat curr_orientation(orientationMsg.w, orientationMsg.x, orientationMsg.y, orientationMsg.z);
-
-    Robot prev_robot = mMainWindow->robot;
-    mMainWindow->robot.position = curr_position;
-    mMainWindow->robot.orientation = curr_orientation;
+    Robot curr_robot;
+    curr_robot.position = glm::vec3(positionMsg.x, positionMsg.y, positionMsg.z);
+    curr_robot.orientation = glm::quat(orientationMsg.w, orientationMsg.x, orientationMsg.y, orientationMsg.z);
 
     static bool isFirst = true;
     if(isFirst){
-        prev_robot = mMainWindow->robot;
         isFirst = false;
+        connect(this, &QNode::receiveRobotPose, mMainWindow, &MainWindow::setRobotPose);
     }
-    mMainWindow->robotTracking(prev_robot, mMainWindow->robot);
+    emit receiveRobotPose(curr_robot);
 }
 
 void QNode::pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg)
@@ -60,14 +56,17 @@ void QNode::pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
         cloud_points.emplace_back(x, y, z);
     }
 
+
+
     assert(mMainWindow != nullptr);
     static bool isFirst = true;
     if(isFirst){
-        connect(this, &QNode::receivePointCloud, mMainWindow, &MainWindow::addRenderer2MainWidget);
+        connect(this, &QNode::receivePointCloud, mMainWindow, &MainWindow::addPointCloudRenderer);
         isFirst = false;
     }
 
     emit receivePointCloud(cloud_points);
+
 
     //RCLCPP_INFO(node->get_logger(), "Extracted %zu points", cloud_points.size());
 }
@@ -90,7 +89,7 @@ QNode::QNode(QObject* parent) : QThread(parent){
     qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
 
     odom_subscription_ = node->create_subscription<nav_msgs::msg::Odometry>(
-            "lio_sam/mapping/odometry", qos, std::bind(&QNode::odom_callback, this, std::placeholders::_1));
+            "odometry/imu", qos, std::bind(&QNode::odom_callback, this, std::placeholders::_1));
 
     pointcloud_subscription_ = node->create_subscription<sensor_msgs::msg::PointCloud2>(
             "lio_sam/mapping/cloud_registered", qos, std::bind(&QNode::pointcloud_callback, this, std::placeholders::_1));

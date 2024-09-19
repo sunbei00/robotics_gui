@@ -23,7 +23,7 @@ namespace Graphics{
     public:
         explicit IPointRenderer(QOpenGLFunctions_4_5_Core* glFunc);
         virtual ~IPointRenderer();
-        virtual void draw(glm::mat4 viewMatrix = glm::mat4(1.f), glm::mat4 projectionMatrix = glm::mat4(1.f)) = 0;
+        virtual void draw(const InteractionCamera& camera) = 0;
     };
 }
 
@@ -45,7 +45,7 @@ namespace Graphics{
         explicit PointRendererSeparated(QOpenGLFunctions_4_5_Core* glFunc, const pcd_data& data);
         explicit PointRendererSeparated(QOpenGLFunctions_4_5_Core* glFunc, pcd_data&& data);
         ~PointRendererSeparated() override;
-        void draw(glm::mat4 viewMatrix = glm::mat4(1.f), glm::mat4 projectionMatrix = glm::mat4(1.f)) override;
+        void draw(const InteractionCamera& camera) override;
     };
 }
 
@@ -66,7 +66,7 @@ namespace Graphics{
         explicit PointRendererSeparatedFiltered(QOpenGLFunctions_4_5_Core* glFunc, const pcd_data& data);
         explicit PointRendererSeparatedFiltered(QOpenGLFunctions_4_5_Core* glFunc, pcd_data&& data);
         ~PointRendererSeparatedFiltered() override;
-        void draw(glm::mat4 viewMatrix = glm::mat4(1.f), glm::mat4 projectionMatrix = glm::mat4(1.f)) override;
+        void draw(const InteractionCamera& camera) override;
     };
 }
 
@@ -88,7 +88,7 @@ namespace Graphics{
         explicit PointRendererInterleaved(QOpenGLFunctions_4_5_Core* glFunc, const std::vector<glm::vec3>& data);
         explicit PointRendererInterleaved(QOpenGLFunctions_4_5_Core* glFunc, std::vector<glm::vec3>&& data);
         ~PointRendererInterleaved() override;
-        void draw(glm::mat4 viewMatrix = glm::mat4(1.f), glm::mat4 projectionMatrix = glm::mat4(1.f)) override;
+        void draw(const InteractionCamera& camera) override;
     };
 }
 
@@ -110,7 +110,7 @@ namespace Graphics{
         explicit PointRendererInterleavedFiltered(QOpenGLFunctions_4_5_Core* glFunc, const std::vector<glm::vec3>& data);
         explicit PointRendererInterleavedFiltered(QOpenGLFunctions_4_5_Core* glFunc, std::vector<glm::vec3>&& data);
         ~PointRendererInterleavedFiltered() override;
-        void draw(glm::mat4 viewMatrix = glm::mat4(1.f), glm::mat4 projectionMatrix = glm::mat4(1.f)) override;
+        void draw(const InteractionCamera& camera) override;
     };
 }
 

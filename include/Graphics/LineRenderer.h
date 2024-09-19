@@ -23,7 +23,7 @@ namespace Graphics{
     public:
         explicit LineRenderer(QOpenGLFunctions_4_5_Core* glFunc);
         ~LineRenderer() override;
-        void draw(glm::mat4 viewMatrix = glm::mat4(1.f), glm::mat4 projectionMatrix = glm::mat4(1.f)) override;
+        void draw(const InteractionCamera& camera) override;
 
     };
 }

@@ -5,21 +5,26 @@
 #ifndef ROBOTICS_GUI_IGRAPHICALBASE_H
 #define ROBOTICS_GUI_IGRAPHICALBASE_H
 #include <QOpenGLFunctions_4_5_Core>
+#include "Graphics/Camera.h"
 #include "Utils/LoadGLSL.h"
 #include "glm.hpp"
 
-
 namespace Graphics{
-}
-
-namespace Graphics{
-    class ZFilter{
-    public:
+    struct ZFilter{
         static float mZMin;
         static float mZMax;
 
         static float mLimitZMin;
         static float mLimitZMax;
+    };
+}
+
+namespace Graphics{
+    struct Light {
+        static glm::vec3 direction;
+        static glm::vec3 ambient;
+        static glm::vec3 diffuse;
+        static glm::vec3 specular;
     };
 }
 
@@ -37,13 +42,12 @@ namespace Graphics{
         QOpenGLFunctions_4_5_Core* glFunc;
         std::string vertexShaderSource;
         std::string fragmentShaderSource;
-        glm::mat4 modelMatrix = glm::mat4(1.f);
-
         static std::string shaderPath;
     public:
+        glm::mat4 modelMatrix = glm::mat4(1.f);
         explicit IGraphicalBase(QOpenGLFunctions_4_5_Core* glFunction);
         virtual ~IGraphicalBase();
-        virtual void draw(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) = 0;
+        virtual void draw(const InteractionCamera& camera) = 0;
     };
 }
 

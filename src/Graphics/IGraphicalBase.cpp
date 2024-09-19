@@ -7,12 +7,20 @@
 #include <iostream>
 
 
+
 namespace Graphics{
     float ZFilter::mZMin = -30;
     float ZFilter::mZMax = 100;
 
     float ZFilter::mLimitZMin = -30;
     float ZFilter::mLimitZMax = 100;
+}
+
+namespace Graphics {
+    glm::vec3 Light::direction{-0.5f, -0.5f, -1.f};
+    glm::vec3 Light::ambient{0.2f, 0.2f, 0.2f};
+    glm::vec3 Light::diffuse{0.5f, 0.5f, 0.5f};
+    glm::vec3 Light::specular{1.0f, 1.0f, 1.0f};
 }
 
 namespace Graphics{

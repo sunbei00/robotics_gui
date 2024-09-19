@@ -42,8 +42,9 @@ namespace Graphics{
         void mouseWheel(float wheel);
         void move(glm::vec3 movement);
 
-        glm::mat4 getViewMatrix();
-        glm::mat4 getPerspectiveMatrix();
+        glm::vec3 getEyePos() const;
+        glm::mat4 getViewMatrix() const;
+        glm::mat4 getPerspectiveMatrix() const;
     };
 }
 

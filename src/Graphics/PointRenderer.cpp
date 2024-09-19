@@ -74,9 +74,9 @@ namespace Graphics{
     }
 
 
-    void PointRendererSeparated::draw(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
+    void PointRendererSeparated::draw(const InteractionCamera& camera) {
         glFunc->glUseProgram(getProgram());
-        setMVPUniform(viewMatrix, projectionMatrix);
+        setMVPUniform(camera.getViewMatrix(), camera.getPerspectiveMatrix());
 
         GLint pointColorLoc = glFunc->glGetUniformLocation(getProgram(), "pointColor");
         glFunc->glUniform3fv(pointColorLoc, 1, &mColor.x);
@@ -164,9 +164,9 @@ namespace Graphics{
         glFunc->glBindVertexArray(0);
     }
 
-    void PointRendererSeparatedFiltered::draw(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
+    void PointRendererSeparatedFiltered::draw(const InteractionCamera& camera) {
         glFunc->glUseProgram(getProgram());
-        setMVPUniform(viewMatrix, projectionMatrix);
+        setMVPUniform(camera.getViewMatrix(), camera.getPerspectiveMatrix());
 
         GLint pointColorLoc = glFunc->glGetUniformLocation(getProgram(), "pointColor");
         glFunc->glUniform3fv(pointColorLoc, 1, &mColor.x);
@@ -238,9 +238,9 @@ namespace Graphics{
     }
 
 
-    void PointRendererInterleaved::draw(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
+    void PointRendererInterleaved::draw(const InteractionCamera& camera) {
         glFunc->glUseProgram(getProgram());
-        setMVPUniform(viewMatrix, projectionMatrix);
+        setMVPUniform(camera.getViewMatrix(), camera.getPerspectiveMatrix());
 
         GLint pointColorLoc = glFunc->glGetUniformLocation(getProgram(), "pointColor");
         glFunc->glUniform3fv(pointColorLoc, 1, &mColor.x);
@@ -307,9 +307,9 @@ namespace Graphics{
     }
 
 
-    void PointRendererInterleavedFiltered::draw(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
+    void PointRendererInterleavedFiltered::draw(const InteractionCamera& camera) {
         glFunc->glUseProgram(getProgram());
-        setMVPUniform(viewMatrix, projectionMatrix);
+        setMVPUniform(camera.getViewMatrix(), camera.getPerspectiveMatrix());
 
         GLint pointColorLoc = glFunc->glGetUniformLocation(getProgram(), "pointColor");
         glFunc->glUniform3fv(pointColorLoc, 1, &mColor.x);

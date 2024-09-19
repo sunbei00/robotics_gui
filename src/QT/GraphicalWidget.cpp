@@ -7,11 +7,13 @@
 
 #include <glm.hpp>
 #include <QMouseEvent>
+#include <gtc/quaternion.hpp>
 
 #include "Graphics/PointRenderer.h"
+#include "Graphics/TriangleRenderer.h"
 
 OpenGLWidget::OpenGLWidget(QWidget *parent)
-        : QOpenGLWidget(parent), mCamera(true) {
+        : QOpenGLWidget(parent), mCamera(true), mRobotRenderer(DATA::Field(),nullptr){
 
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &OpenGLWidget::widgetUpdate);
@@ -24,6 +26,8 @@ OpenGLWidget::~OpenGLWidget() {
 
     for(auto& it : mRenderer)
         delete it.second;
+
+    delete mRobotRenderer.second;
 }
 
 void OpenGLWidget::initializeGL() {
@@ -33,6 +37,9 @@ void OpenGLWidget::initializeGL() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.188235294, 0.188235294, 0.188235294, 1.0f);
+
+    DATA::Field field(0, DATA::GET_DATA_METHOD::OBJ, DATA::DATA_TYPE::ROBOT);
+    mRobotRenderer = {field, new Graphics::OBJLoaderTriangleRenderer(Graphics::OBJLoader::meshPath + "/scoutmini.obj" ,this)};
 }
 
 void OpenGLWidget::resizeGL(int w, int h) {
@@ -43,9 +50,10 @@ void OpenGLWidget::resizeGL(int w, int h) {
 void OpenGLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for(auto& it : mRenderer){
-        it.second->draw(mCamera.getViewMatrix(), mCamera.getPerspectiveMatrix());
-    }
+    for(auto& it : mRenderer)
+        it.second->draw(mCamera);
+
+    mRobotRenderer.second->draw(mCamera);
 }
 
 void OpenGLWidget::mousePressEvent(QMouseEvent* event) {
@@ -76,4 +84,15 @@ void OpenGLWidget::addRenderer(DATA::Field field, Graphics::IGraphicalBase* rend
 void OpenGLWidget::moveCamera(glm::vec3 movement) {
     mCamera.move(movement);
 }
+
+void OpenGLWidget::moveRobot(Robot current) {
+
+
+    glm::mat4 modelRotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    mRobotRenderer.second->modelMatrix = glm::translate(glm::mat4(1.0f), current.position) * glm::mat4_cast(current.orientation) * modelRotate;
+}
+
+DATA::Field::Field(unsigned int time, GET_DATA_METHOD method, DATA_TYPE type) : mTime(time), mMethod(method), mType(type){}
+
 

@@ -9,13 +9,18 @@
 #include <QTimer>
 #include "Graphics/IGraphicalBase.h"
 #include "Graphics/Camera.h"
+#include "Definition/Robot.h"
 
 namespace DATA{
-    enum class GET_DATA_METHOD{ROS, PCD};
+    enum class GET_DATA_METHOD{ROS, PCD, OBJ, NONE};
+    enum class DATA_TYPE{POINT_CLOUD, MESH, ROBOT, NONE};
 
     struct Field{
-        unsigned int time;
-        GET_DATA_METHOD method;
+        unsigned int mTime;
+        GET_DATA_METHOD mMethod;
+        DATA_TYPE mType;
+
+        Field(unsigned int time=0, GET_DATA_METHOD method = GET_DATA_METHOD::NONE, DATA_TYPE type = DATA_TYPE::NONE);
     };
 }
 
@@ -36,6 +41,8 @@ protected:
     Graphics::InteractionCamera mCamera;
     QTimer* timer;
     std::vector<std::pair<DATA::Field, Graphics::IGraphicalBase*>> mRenderer;
+    std::pair<DATA::Field, Graphics::IGraphicalBase*> mRobotRenderer;
+
 public:
     explicit OpenGLWidget(QWidget *parent = nullptr);
     ~OpenGLWidget() override;
@@ -45,6 +52,7 @@ public:
 public slots:
     void widgetUpdate();
     void moveCamera(glm::vec3 movement);
+    void moveRobot(Robot current);
 
 };
 

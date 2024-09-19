@@ -1,9 +1,11 @@
-#include <QMenuBar>
-#include <QBoxLayout>
-#include <QScreen>
 #include <QGuiApplication>
-#include <QToolBar>
+#include <QStackedWidget>
 #include <QFileDialog>
+#include <QDockWidget>
+#include <QBoxLayout>
+#include <QToolBar>
+#include <QMenuBar>
+#include <QScreen>
 
 #include "QT/MainWindow.h"
 #include "QT/GraphicalWidget.h"
@@ -42,7 +44,6 @@ void MainWindow::constructMenubar() {
 
     QMenu *helpMenu = new QMenu("Help", this);
     QAction *aboutAction = new QAction("About", this);
-    // connect(aboutAction, &QAction::triggered, this, &MainWindow::showAboutDialog);
     helpMenu->addAction(aboutAction);
     menuBar->addMenu(helpMenu);
 
@@ -100,12 +101,11 @@ void MainWindow::loadPCDFile() {
     if (!fileName.isEmpty()) {
         Graphics::pcd_data data;
         Utils::loadPCD(fileName.toStdString(), data);
-        DATA::Field field {0, DATA::GET_DATA_METHOD::PCD};
+        DATA::Field field(0, DATA::GET_DATA_METHOD::PCD, DATA::DATA_TYPE::POINT_CLOUD);
         mainWidget->makeCurrent();
         mainWidget->addRenderer(field, new Graphics::PointRendererSeparatedFiltered(mainWidget, std::move(data)));
         mainWidget->doneCurrent();
     }
-
 }
 
 void MainWindow::constructDockWidget() {
@@ -123,32 +123,38 @@ void MainWindow::constructDockWidget() {
     addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 }
 
-void MainWindow::robotTracking(Robot prev, Robot current) {
+
+void MainWindow::setRobotTrackingMode(bool isTracking) {
+    mIsRobotTracking = isTracking;
+}
+
+void MainWindow::addPointCloudRenderer(const std::vector<glm::vec3>& point_cloud ) {
+    assert(mainWidget != nullptr);
+
+    DATA::Field field(0, DATA::GET_DATA_METHOD::ROS, DATA::DATA_TYPE::POINT_CLOUD);
+    mainWidget->makeCurrent();
+    mainWidget->addRenderer(field, new Graphics::PointRendererInterleavedFiltered(mainWidget, point_cloud));
+    mainWidget->doneCurrent();
+
+}
+
+void MainWindow::setRobotPose(Robot current){
     assert(mainWidget != nullptr);
     if(mainWidget == nullptr)
         return;
 
     static bool isFirst = true;
     if(isFirst){
-        connect(this, &MainWindow::robotMoved, mainWidget, &OpenGLWidget::moveCamera);
+        connect(this, &MainWindow::robotMovedIncremental, mainWidget, &OpenGLWidget::moveCamera);
+        connect(this, &MainWindow::robotMoved, mainWidget, &OpenGLWidget::moveRobot);
         isFirst = false;
     }
-
+    Robot prev = robot;
     glm::vec3 movement = current.position - prev.position;
     if(mIsRobotTracking)
-        emit robotMoved(movement);
-}
+        emit robotMovedIncremental(movement);
 
-void MainWindow::setRobotTrackingMode(bool isTracking) {
-    mIsRobotTracking = isTracking;
-}
+    emit robotMoved(current);
 
-void MainWindow::addRenderer2MainWidget(const std::vector<glm::vec3>& point_cloud ) {
-    assert(mainWidget != nullptr);
-
-    DATA::Field field {0, DATA::GET_DATA_METHOD::ROS};
-    mainWidget->makeCurrent();
-    mainWidget->addRenderer(field, new Graphics::PointRendererInterleavedFiltered(mainWidget, point_cloud));
-    mainWidget->doneCurrent();
-
+    robot = current;
 }

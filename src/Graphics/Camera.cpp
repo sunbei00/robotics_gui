@@ -59,11 +59,15 @@ namespace Graphics {
         }
     }
 
-    glm::mat4 InteractionCamera::getViewMatrix() {
+    glm::mat4 InteractionCamera::getViewMatrix() const{
         return glm::lookAt(mCamera.eye, mCamera.cen, mCamera.up);
     }
 
-    glm::mat4 InteractionCamera::getPerspectiveMatrix() {
+    glm::vec3 InteractionCamera::getEyePos() const{
+        return mCamera.eye;
+    }
+
+    glm::mat4 InteractionCamera::getPerspectiveMatrix() const{
         return glm::perspective(glm::radians(60.0f), (float)mCamera.rect.x / (float)mCamera.rect.y, 0.01f, 1000.0f);
     }
 
@@ -81,10 +85,7 @@ namespace Graphics {
     }
 
     void InteractionCamera::move(glm::vec3 movement) {
-        if(mIsRobotics)
-            std::swap(movement.y, movement.z);
-
-        mCamera.cen += movement;
+         mCamera.cen += movement;
         mCamera.eye += movement;
     }
 }

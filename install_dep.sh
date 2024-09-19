@@ -27,6 +27,7 @@ source ~/.bashrc
 mkdir 3rdParty
 cd 3rdParty
 
+# sudo apt-get install qt6-base-dev
 wget https://download.qt.io/archive/qt/6.5/6.5.3/single/qt-everywhere-src-6.5.3.tar.xz
 tar -xf qt-everywhere-src-6.5.3.tar.xz
 rm qt-everywhere-src-6.5.3.tar.xz
@@ -42,12 +43,22 @@ cmake .. -DCMAKE_INSTALL_PREFIX=../../Qt6 \
  -DFEATURE_xcb-shape=ON \
  -DFEATURE_xcb-xinerama=ON \
  -DFEATURE_xkbcommon-x11=ON
-
-# sudo apt-get install qt6-base-dev
-
 make -j6 && make install
 cd ../..
 rm -r qt-everywhere-src-6.5.3
+
+
+# sudo apt-get install libassimp-dev
+wget https://github.com/assimp/assimp/archive/refs/tags/v5.4.3.tar.gz
+tar -zxvf v5.4.3.tar.gz
+rm v5.4.3.tar.gz
+cd assimp-5.4.3
+mkdir build
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=../../assimp
+make -j6 && make install
+cd ../..
+rm -r assimp-5.4.3
 
 wget https://github.com/g-truc/glm/archive/refs/tags/1.0.1.tar.gz
 tar -xf 1.0.1.tar.gz

@@ -37,12 +37,17 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
+# Assimp
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};/root/share/code/robotics_gui/3rdParty/assimp/lib/cmake/assimp-5.4")
+find_package(assimp REQUIRED)
+
+
 FILE(GLOB SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Graphics/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/QT/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/ROS2/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/Graphics/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
 FILE(GLOB MOC_HEADERS
@@ -72,7 +77,7 @@ else()
 endif ()
 
 
-target_include_directories(gui PRIVATE ${HEADERS})
+target_include_directories(gui PRIVATE ${HEADERS} ${ASSIMP_INCLUDE_DIR})
 target_link_libraries(gui
         Qt6::OpenGLWidgets
         Qt6::Widgets
@@ -80,6 +85,7 @@ target_link_libraries(gui
         Qt6::Core
         Qt6::Gui
         ${OPENMP_LIBRARY}
+        ${ASSIMP_LIBRARIES}
 )
 
 
@@ -98,11 +104,18 @@ install(TARGETS
 #        DESTINATION lib/${PROJECT_NAME}/shader/
 #)
 # add_definitions(-DSHADER_DIR="${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}/shader")
+#
+#install(
+#        DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/mesh/
+#        DESTINATION lib/${PROJECT_NAME}/mesh/
+#)
+# add_definitions(-DSHADER_DIR="${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}/mesh")
 
 # below option is for CLion and ROS. but ROS is limited.
 # program source code path is fixed by shader path
 # CLION is not installing. so, currently use fixed shader path
 add_definitions(-DSHADER_DIR="${CMAKE_CURRENT_SOURCE_DIR}/shader")
+add_definitions(-DMESH_DIR="${CMAKE_CURRENT_SOURCE_DIR}/mesh")
 
 
 ament_package()

@@ -34,9 +34,9 @@ namespace Graphics{
         glFunc->glBindVertexArray(0);
     }
 
-    void LineRenderer::draw(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
+    void LineRenderer::draw(const InteractionCamera& camera) {
         glFunc->glUseProgram(getProgram());
-        setMVPUniform(viewMatrix, projectionMatrix);
+        setMVPUniform(camera.getViewMatrix(), camera.getPerspectiveMatrix());
 
     }
 
