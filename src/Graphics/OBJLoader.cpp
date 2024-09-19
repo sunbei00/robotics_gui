@@ -97,10 +97,8 @@ namespace Graphics{
             }
         }
 
-        if (mesh->mMaterialIndex >= 0) {
-            aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-            finalMesh.material = loadMaterial(material);
-        }
+        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+        finalMesh.material = loadMaterial(material);
 
         return finalMesh;
     }

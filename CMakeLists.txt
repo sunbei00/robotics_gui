@@ -43,11 +43,11 @@ find_package(assimp REQUIRED)
 
 
 FILE(GLOB SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Graphics/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/QT/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/ROS2/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
 FILE(GLOB MOC_HEADERS

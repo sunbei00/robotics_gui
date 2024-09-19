@@ -24,10 +24,12 @@ OpenGLWidget::~OpenGLWidget() {
     timer->stop();
     delete timer;
 
+    makeCurrent();
     for(auto& it : mRenderer)
         delete it.second;
 
     delete mRobotRenderer.second;
+    doneCurrent();
 }
 
 void OpenGLWidget::initializeGL() {
