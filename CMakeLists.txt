@@ -62,7 +62,7 @@ set(HEADERS
 )
 
 set(RESOURCES
-    "${CMAKE_CURRENT_SOURCE_DIR}/resources.qrc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/images/resources.qrc"
 )
 
 add_executable(gui ${SOURCES} ${MOC_HEADERS} ${RESOURCES})
@@ -100,22 +100,22 @@ install(TARGETS
 # below option is for ROS
 # CLION is not installing. so, currently use fixed shader path
 #install(
-#        DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shader/
-#        DESTINATION lib/${PROJECT_NAME}/shader/
+#        DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/resources/shader/
+#        DESTINATION lib/${PROJECT_NAME}/resources/shader/
 #)
-# add_definitions(-DSHADER_DIR="${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}/shader")
+# add_definitions(-DSHADER_DIR="${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}/resources/shader")
 #
 #install(
-#        DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/mesh/
-#        DESTINATION lib/${PROJECT_NAME}/mesh/
+#        DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/resources/mesh/
+#        DESTINATION lib/${PROJECT_NAME}/resources/mesh/
 #)
-# add_definitions(-DSHADER_DIR="${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}/mesh")
+# add_definitions(-DMESH_DIR="${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}/resources/mesh")
 
 # below option is for CLion and ROS. but ROS is limited.
 # program source code path is fixed by shader path
 # CLION is not installing. so, currently use fixed shader path
-add_definitions(-DSHADER_DIR="${CMAKE_CURRENT_SOURCE_DIR}/shader")
-add_definitions(-DMESH_DIR="${CMAKE_CURRENT_SOURCE_DIR}/mesh")
+add_definitions(-DSHADER_DIR="${CMAKE_CURRENT_SOURCE_DIR}/resources/shader")
+add_definitions(-DMESH_DIR="${CMAKE_CURRENT_SOURCE_DIR}/resources/mesh")
 
 
 ament_package()

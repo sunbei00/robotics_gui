@@ -54,9 +54,9 @@ void MainWindow::constructToolbar(){
 
     QToolBar* toolBar = new QToolBar(this);
 
-    QAction* viewer = new QAction(QIcon(":/resources/eye.png"), "Camera View", toolBar);
-    QAction* flag = new QAction(QIcon(":/resources/flag.png"), "Path Selection", toolBar);
-    QAction* mapFix = new QAction(QIcon(":/resources/hammer.png"), "Fix Map", toolBar);
+    QAction* viewer = new QAction(QIcon(":/eye.png"), "Camera View", toolBar);
+    QAction* flag = new QAction(QIcon(":/flag.png"), "Path Selection", toolBar);
+    QAction* mapFix = new QAction(QIcon(":/hammer.png"), "Fix Map", toolBar);
     // To Do : Graphical Viewer
 
     toolBar->addAction(viewer);
