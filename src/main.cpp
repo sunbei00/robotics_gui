@@ -3,8 +3,6 @@
 #include "QT/MainWindow.h"
 
 int main(int argc, char** argv){
-    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
-
     QSurfaceFormat format;
     format.setVersion(4, 5);
     format.setProfile(QSurfaceFormat::CoreProfile);

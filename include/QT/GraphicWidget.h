@@ -18,6 +18,7 @@ Q_OBJECT
 
 protected:
     Graphics::InteractionCamera mCamera;
+
     QTimer* timer;
     std::vector<std::pair<DATA::Field, Graphics::IGraphicalBase*>> mRenderer;
     std::pair<DATA::Field, Graphics::IGraphicalBase*> mRobotRenderer;
@@ -42,6 +43,8 @@ public slots:
     void widgetUpdate();
     void moveCamera(glm::vec3 movement);
     void moveRobot(Robot current);
+    void setTopView(bool isTopView);
+
 
 };
 

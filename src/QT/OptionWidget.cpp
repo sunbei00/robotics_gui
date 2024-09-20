@@ -16,29 +16,25 @@ ViewOption::ViewOption(MainWindow* mainWindow, QWidget *parent) : QWidget(parent
 
     QVBoxLayout* All = new QVBoxLayout();
 
-    QWidget* zFilterWidget = new QWidget(this);
-    QLayout* zFilterLayout = constructZFilter();
-    zFilterWidget->setLayout(zFilterLayout);
-
-    All->addWidget(zFilterWidget);
-
-
-    QWidget* trackingWidget = constructRobotTracking();
-    All->addWidget(trackingWidget);
+    All->addWidget(constructZFilter());
+    All->addWidget(constructRobotTracking());
+    All->addWidget(constructTopView());
 
     All->addStretch();
 
     setLayout(All);
 }
 
-QLayout *ViewOption::constructZFilter() {
+QWidget* ViewOption::constructZFilter() {
+    QWidget* zFilterWidget = new QWidget(this);
+    QVBoxLayout* layout = new QVBoxLayout();
+    zFilterWidget->setLayout(layout);
+
     auto& min = Graphics::ZFilter::mZMin;
     auto& max = Graphics::ZFilter::mZMax;
 
     auto& minLimit = Graphics::ZFilter::mLimitZMin;
     auto& maxLimit = Graphics::ZFilter::mLimitZMax;
-
-    QVBoxLayout* layout = new QVBoxLayout();
 
     QSlider *minSlider = new QSlider(Qt::Horizontal, this);
     QSlider *maxSlider = new QSlider(Qt::Horizontal,this);
@@ -111,7 +107,7 @@ QLayout *ViewOption::constructZFilter() {
         maxDoubleSpinBox->setValue(max);
     });
 
-    return layout;
+    return zFilterWidget;
 }
 
 QWidget* ViewOption::constructRobotTracking() {
@@ -121,15 +117,44 @@ QWidget* ViewOption::constructRobotTracking() {
 
     QLabel* trackingLabel = new QLabel("Tracking Mode: ", robotTrackingWidget);
     QCheckBox* trackingMode = new QCheckBox(robotTrackingWidget);
-    if(mMainWindow->mIsRobotTracking)
-        trackingMode->setCheckState(Qt::CheckState::Checked);
-    else
-        trackingMode->setCheckState(Qt::CheckState::Unchecked);
     connect(trackingMode, &QCheckBox::toggled, mMainWindow, &MainWindow::setRobotTrackingMode);
+    if(mIsRobotTracking) {
+        trackingMode->setCheckState(Qt::CheckState::Checked);
+        emit trackingMode->toggled(true);
+    }
+    else {
+        trackingMode->setCheckState(Qt::CheckState::Unchecked);
+        emit trackingMode->toggled(false);
+    }
+
     robotTrackingLayout->addWidget(trackingLabel);
     robotTrackingLayout->addWidget(trackingMode);
 
     return robotTrackingWidget;
+}
+
+QWidget* ViewOption::constructTopView() {
+    QWidget* topViewWidget = new QWidget(this);
+    QHBoxLayout* topViewLayout = new QHBoxLayout();
+    topViewWidget->setLayout(topViewLayout);
+
+    QLabel* topViewLabel = new QLabel("Top View Mode: ", topViewWidget);
+    QCheckBox* topViewMode = new QCheckBox(topViewWidget);
+    connect(topViewMode, &QCheckBox::toggled, mMainWindow, &MainWindow::setTopView);
+    if(mIsTopView) {
+        topViewMode->setCheckState(Qt::CheckState::Checked);
+        emit topViewMode->toggled(true);
+    }
+    else {
+        topViewMode->setCheckState(Qt::CheckState::Unchecked);
+        emit topViewMode->toggled(false);
+    }
+
+
+    topViewLayout->addWidget(topViewLabel);
+    topViewLayout->addWidget(topViewMode);
+
+    return topViewWidget;
 }
 
 ViewOption::~ViewOption() = default;

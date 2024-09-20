@@ -5,6 +5,30 @@
 #include "ROS2/QNode.h"
 #include "QT/MainWindow.h"
 
+
+QNode::QNode(MainWindow* mainWindow, QObject* parent) : QThread(parent), mMainWindow(mainWindow){
+    assert(mMainWindow != nullptr);
+
+    int argc = 0;
+    char** argv = nullptr;
+    rclcpp::init(argc, argv);
+
+    node = std::make_shared<rclcpp::Node>("robotics_gui");
+
+    rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+    qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
+
+    odom_subscription_ = node->create_subscription<nav_msgs::msg::Odometry>(
+            "odometry/imu", qos, std::bind(&QNode::odom_callback, this, std::placeholders::_1));
+
+    pointcloud_subscription_ = node->create_subscription<sensor_msgs::msg::PointCloud2>(
+            "lio_sam/mapping/cloud_registered", qos, std::bind(&QNode::pointcloud_callback, this, std::placeholders::_1));
+
+
+    connect(this, &QNode::receivePointCloud, mMainWindow, &MainWindow::addPointCloudRenderer);
+    connect(this, &QNode::receiveRobotPose, mMainWindow, &MainWindow::setRobotPose);
+}
+
 void QNode::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
 {
     assert(mMainWindow != nullptr);
@@ -55,35 +79,6 @@ void QNode::pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
     emit receivePointCloud(cloud_points);
 
     //RCLCPP_INFO(node->get_logger(), "Extracted %zu points", cloud_points.size());
-}
-
-QNode::QNode(QObject* parent) : QThread(parent){
-    if(parent != nullptr){
-        mMainWindow = dynamic_cast<MainWindow*>(parent);
-        assert(mMainWindow != nullptr);
-    }
-    else
-        mMainWindow = nullptr;
-
-    int argc = 0;
-    char** argv = nullptr;
-    rclcpp::init(argc, argv);
-
-    node = std::make_shared<rclcpp::Node>("robotics_gui");
-
-    rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
-    qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
-
-    odom_subscription_ = node->create_subscription<nav_msgs::msg::Odometry>(
-            "odometry/imu", qos, std::bind(&QNode::odom_callback, this, std::placeholders::_1));
-
-    pointcloud_subscription_ = node->create_subscription<sensor_msgs::msg::PointCloud2>(
-            "lio_sam/mapping/cloud_registered", qos, std::bind(&QNode::pointcloud_callback, this, std::placeholders::_1));
-
-
-    connect(this, &QNode::receivePointCloud, mMainWindow, &MainWindow::addPointCloudRenderer);
-    connect(this, &QNode::receiveRobotPose, mMainWindow, &MainWindow::setRobotPose);
-
 }
 
 void QNode::run(){

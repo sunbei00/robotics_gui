@@ -13,7 +13,7 @@
 #include "Graphics/PointRenderer.h"
 #include "QT/OptionWidget.h"
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent){
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     this->mQNode = std::make_shared<QNode>(this);
     this->mQNode->start();
 
@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent){
     assert(mainWidget != nullptr);
     connect(this, &MainWindow::robotMovedIncremental, mainWidget, &OpenGLWidget::moveCamera);
     connect(this, &MainWindow::robotMoved, mainWidget, &OpenGLWidget::moveRobot);
+    connect(this, &MainWindow::topView, mainWidget, &OpenGLWidget::setTopView);
 }
 
 void MainWindow::constructMenubar() {
@@ -96,7 +97,9 @@ void MainWindow::selectOption(int index) {
     if(!dockWidget->isVisible())
         dockWidget->show();
 
-    ((QStackedWidget*)dockWidget->widget())->setCurrentIndex(index);
+    QStackedWidget* stackWidget = dynamic_cast<QStackedWidget*>(dockWidget->widget());
+    assert(stackWidget != nullptr);
+    stackWidget->setCurrentIndex(index);
 
 }
 
@@ -110,6 +113,10 @@ void MainWindow::loadPCDFile() {
         mainWidget->addRenderer(field, new Graphics::PointRendererSeparatedFiltered(mainWidget, std::move(data)));
         mainWidget->doneCurrent();
     }
+}
+
+void MainWindow::setRobotTrackingMode(bool isTracking) {
+    mIsRobotTracking = isTracking;
 }
 
 void MainWindow::constructDockWidget() {
@@ -127,11 +134,6 @@ void MainWindow::constructDockWidget() {
     addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 }
 
-
-void MainWindow::setRobotTrackingMode(bool isTracking) {
-    mIsRobotTracking = isTracking;
-}
-
 void MainWindow::addPointCloudRenderer(const std::vector<glm::vec3>& point_cloud ) {
     DATA::Field field(0, DATA::GET_DATA_METHOD::ROS, DATA::DATA_TYPE::POINT_CLOUD);
     mainWidget->makeCurrent(); // To do : delete this
@@ -140,6 +142,7 @@ void MainWindow::addPointCloudRenderer(const std::vector<glm::vec3>& point_cloud
 }
 
 void MainWindow::setRobotPose(Robot current){
+    assert(mainWidget != nullptr);
     Robot prev = robot;
     glm::vec3 movement = current.position - prev.position;
     if(mIsRobotTracking)
@@ -149,3 +152,9 @@ void MainWindow::setRobotPose(Robot current){
 
     robot = current;
 }
+
+void MainWindow::setTopView(bool isTopView) {
+    assert(mainWidget != nullptr);
+    emit topView(isTopView);
+}
+

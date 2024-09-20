@@ -12,13 +12,16 @@ class ViewOption : public QWidget{
     Q_OBJECT
 private:
     MainWindow* mMainWindow;
+
+    bool mIsTopView = false;
+    bool mIsRobotTracking = false;
 protected:
-    QLayout* constructZFilter();
+    QWidget* constructZFilter();
     QWidget* constructRobotTracking();
+    QWidget* constructTopView();
 public:
     explicit ViewOption(MainWindow* mainWindow, QWidget* parent = nullptr);
     virtual ~ViewOption();
-
 };
 
 

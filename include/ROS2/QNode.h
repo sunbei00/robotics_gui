@@ -33,7 +33,7 @@ signals:
 
 
 public:
-    QNode(QObject* parent = nullptr);
+    QNode(MainWindow* mainWindow, QObject* parent = nullptr);
     ~QNode() override = default;
     void run() override;
 };

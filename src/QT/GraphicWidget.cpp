@@ -13,8 +13,7 @@
 #include "Graphics/TriangleRenderer.h"
 
 OpenGLWidget::OpenGLWidget(QWidget *parent)
-        : QOpenGLWidget(parent), mCamera(true), mRobotRenderer(DATA::Field(),nullptr){
-
+        : QOpenGLWidget(parent), mRobotRenderer(DATA::Field(),nullptr){
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &OpenGLWidget::widgetUpdate);
     timer->start(16); // 60 fps
@@ -51,7 +50,6 @@ void OpenGLWidget::resizeGL(int w, int h) {
 
 void OpenGLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     for(auto& it : mRenderer)
         it.second->draw(mCamera);
 
@@ -60,15 +58,17 @@ void OpenGLWidget::paintGL() {
 
 void OpenGLWidget::mousePressEvent(QMouseEvent* event) {
     mCamera.mousePressed(event->button() == Qt::LeftButton, event->button() == Qt::RightButton,
-                     { event->pos().x(),  event->pos().y()});
+                         { event->pos().x(),  event->pos().y()});
 }
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent* event) {
     mCamera.mouseMoved({event->pos().x(), event->pos().y()});
+
 }
 
 void OpenGLWidget::mouseReleaseEvent(QMouseEvent*) {
     mCamera.mouseReleased();
+
 }
 
 void OpenGLWidget::wheelEvent(QWheelEvent* event){
@@ -84,14 +84,17 @@ void OpenGLWidget::addRenderer(DATA::Field field, Graphics::IGraphicalBase* rend
 }
 
 void OpenGLWidget::moveCamera(glm::vec3 movement) {
-    mCamera.move(movement);
+        mCamera.move(movement);
 }
 
 void OpenGLWidget::moveRobot(Robot current) {
-
-
+    // robot obj model error
     glm::mat4 modelRotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
     mRobotRenderer.second->modelMatrix = glm::translate(glm::mat4(1.0f), current.position) * glm::mat4_cast(current.orientation) * modelRotate;
+}
+
+void OpenGLWidget::setTopView(bool isTopView) {
+    mCamera.setTopView(isTopView);
 }
 

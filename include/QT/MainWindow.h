@@ -11,6 +11,8 @@
 
 class MainWindow : public QMainWindow{
     Q_OBJECT
+private: // for qt communication
+    bool mIsRobotTracking;
 private: // ros
     std::shared_ptr<QNode> mQNode;
 private: // qt
@@ -32,14 +34,13 @@ public slots:
     void setRobotTrackingMode(bool isTracking);
     void addPointCloudRenderer(const std::vector<glm::vec3>& point_cloud);
     void setRobotPose(Robot current);
+    void setTopView(bool isTopView);
+
 signals:
     void robotMovedIncremental(glm::vec3 movement);
     void robotMoved(Robot pose);
+    void topView(bool isTopView);
 
-public: // robot info
-    // To do : add mutex?? -> value is set by QNode. QNode is single thread. is it okay?
-    // add mutex to Camera??? -> but event driven. is it okay? -> need to check.
-    bool mIsRobotTracking = false;
 public:
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override = default;
