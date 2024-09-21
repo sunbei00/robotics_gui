@@ -80,6 +80,8 @@ void QNode::pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
 
 void QNode::run(){
     while(rclcpp::ok()){
+        if(rosExit)
+            break;
         rclcpp::spin_some(node);
         // RCLCPP_INFO(node->get_logger(), "loop");
     }

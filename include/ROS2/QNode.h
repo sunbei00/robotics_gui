@@ -30,7 +30,8 @@ private:
 signals:
     void sAddPointCloud(const std::vector<glm::vec3>& point_cloud, DATA::Field field);
     void sSetRobotPose(RobotPose current);
-
+public:
+    bool rosExit = false;
 public:
     QNode(QObject* parent = nullptr);
     ~QNode() override = default;

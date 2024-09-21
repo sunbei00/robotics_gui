@@ -28,20 +28,24 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     constructMainWidget();
     constructDockWidget();
 
-    selectOption(0);
-
-    connect(this, &MainWindow::sAddPCD, QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::addSeparatedPointCloud);
-
-    connect(this, &MainWindow::sSelectOptionMenu, QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::selectOptionMenu);
-
     QTHub::GraphicHub::getSingleton()->setHubParent(this);
     QTHub::OptionHub::getSingleton()->setHubParent(this);
     QTHub::RobotHub::getSingleton()->setHubParent(this);
+
+    connect(this, &MainWindow::sSelectOptionMenu, QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::selectOptionMenu);
+
+    connect(this, &MainWindow::sAddPCD, QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::addSeparatedPointCloud);
+
+
+    selectOption(0);
 }
 
 MainWindow::~MainWindow() {
-    if (mQNode && mQNode->isRunning())
+    if (mQNode && mQNode->isRunning()){
+        mQNode->rosExit = true;
         mQNode->exit();
+        mQNode->wait();
+    }
 }
 
 void MainWindow::constructMenubar() {

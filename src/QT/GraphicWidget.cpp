@@ -22,7 +22,7 @@ OpenGLWidget::OpenGLWidget(QWidget *parent)
 
     connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sTopView, this, [this](bool isTopView){mCamera.setTopView(isTopView);});
     connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sRobotTracking, this, [this](bool isRobotTracking){ mIsRobotTracking = isRobotTracking;});
-    connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sSelectOptionMenu, this, [this](int idx){mSelectedOptionMenu = idx; std::cout << mSelectedOptionMenu << std::endl;});
+    connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sSelectOptionMenu, this, [this](int idx){mSelectedOptionMenu = idx;});
     connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sClearMap, this, &OpenGLWidget::clearMap);
 
     connect(QTHub::RobotHub::getSingleton(), &QTHub::RobotHub::sSetRobotPose, this, &OpenGLWidget::setRobotPose);
