@@ -27,5 +27,9 @@ namespace QTHub {
     void OptionHub::setRobotTracking(bool isTracking) {
         emit sRobotTracking(isTracking);
     }
+
+    void OptionHub::clearMap() {
+        emit sClearMap();
+    }
 }
 

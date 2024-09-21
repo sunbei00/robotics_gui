@@ -34,7 +34,7 @@ signals:
 
 public:
     explicit MainWindow(QWidget* parent = nullptr);
-    ~MainWindow() override = default;
+    ~MainWindow() override;
 };
 
 

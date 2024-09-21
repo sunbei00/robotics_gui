@@ -21,6 +21,7 @@ OpenGLWidget::OpenGLWidget(QWidget *parent)
 
     connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sTopView, this, &OpenGLWidget::setTopView);
     connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sRobotTracking, this, &OpenGLWidget::setRobotTracking);
+    connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sClearMap, this, &OpenGLWidget::clearMap);
 
     connect(QTHub::RobotHub::getSingleton(), &QTHub::RobotHub::sSetRobotPose, this, &OpenGLWidget::setRobotPose);
 
@@ -29,7 +30,6 @@ OpenGLWidget::OpenGLWidget(QWidget *parent)
 }
 
 OpenGLWidget::~OpenGLWidget() {
-    while(mTimer->isActive()){} // To do : Test, is Run !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     mTimer->stop();
     delete mTimer;
 
@@ -140,6 +140,14 @@ void OpenGLWidget::addSeparatedPointCloudRenderer(const Graphics::pcd_data& poin
     makeCurrent();
     mRenderer.push_back({field, new Graphics::PointRendererSeparatedFiltered(this, pointCloud)});
     doneCurrent();
+}
+
+void OpenGLWidget::clearMap() {
+    makeCurrent();
+    for(auto& it : mRenderer)
+        delete it.second;
+    doneCurrent();
+    mRenderer.clear();
 }
 
 

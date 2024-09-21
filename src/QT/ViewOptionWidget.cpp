@@ -6,9 +6,14 @@
 #include <QSlider>
 #include <QLabel>
 #include <QCheckBox>
+#include <QPushButton>
+
 
 #include "QTHub/OptionHub.h"
 #include "QT/ViewOptionWidget.h"
+
+#include <QFileDialog>
+
 #include "QT/MainWindow.h"
 #include "Graphics/IGraphicalBase.h"
 
@@ -19,6 +24,7 @@ ViewOption::ViewOption(QWidget *parent) : IOptionBase(parent){
     All->addWidget(constructZFilter());
     All->addWidget(constructRobotTracking());
     All->addWidget(constructTopView());
+    All->addWidget(constructClearMap());
 
     All->addStretch();
 
@@ -148,6 +154,20 @@ QWidget* ViewOption::constructTopView() {
     topViewLayout->addWidget(topViewMode);
 
     return topViewWidget;
+}
+
+QWidget* ViewOption::constructClearMap() {
+    QWidget* widget = new QWidget(this);
+    QHBoxLayout* layout = new QHBoxLayout();
+    widget->setLayout(layout);
+
+    QPushButton* button = new QPushButton(widget);
+    button->setText("Clear Map");
+    connect(button, &QPushButton::clicked, QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::clearMap);
+
+    layout->addWidget(button);
+
+    return widget;
 }
 
 ViewOption::~ViewOption() = default;

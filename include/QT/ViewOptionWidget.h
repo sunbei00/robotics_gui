@@ -10,12 +10,13 @@
 class ViewOption final : public IOptionBase{
     Q_OBJECT
 private:
-    bool mIsTopView = true;
+    bool mIsTopView = false;
     bool mIsRobotTracking = false;
 protected:
     QWidget* constructZFilter();
     QWidget* constructRobotTracking();
     QWidget* constructTopView();
+    QWidget* constructClearMap();
 public:
     explicit ViewOption(QWidget* parent = nullptr);
     ~ViewOption() override;

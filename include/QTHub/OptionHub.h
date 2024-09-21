@@ -20,10 +20,11 @@ namespace QTHub {
     signals:
         void sTopView(bool isTopView);
         void sRobotTracking(bool isTrackingMode);
+        void sClearMap();
     public slots:
         void setTopView(bool isTopView);
         void setRobotTracking(bool isTracking);
-
+        void clearMap();
     };
 
 }

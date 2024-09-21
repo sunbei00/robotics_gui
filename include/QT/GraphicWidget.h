@@ -53,6 +53,8 @@ public slots:
     void addInterleavedPointCloudRenderer(const std::vector<glm::vec3>& pointCloud, DATA::Field field);
     void addSeparatedPointCloudRenderer(const Graphics::pcd_data& pointCloud, DATA::Field field);
 
+    void clearMap();
+
 };
 
 

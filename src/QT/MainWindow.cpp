@@ -7,9 +7,12 @@
 #include <QMenuBar>
 #include <QScreen>
 
+#include "QTHub/OptionHub.h"
+#include "QTHub/RobotHub.h"
 #include "QT/MainWindow.h"
 #include "QT/GraphicWidget.h"
 #include "QT/ViewOptionWidget.h"
+#include "QT/PathOptionWidget.h"
 #include "Utils/LoadPCD.h"
 #include "Utils/GetTime.h"
 
@@ -28,6 +31,17 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     selectOption(0);
 
     connect(this, &MainWindow::sAddPCD, QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::addSeparatedPointCloud);
+
+    QTHub::GraphicHub::getSingleton()->setHubParent(this);
+    QTHub::OptionHub::getSingleton()->setHubParent(this);
+    QTHub::RobotHub::getSingleton()->setHubParent(this);
+}
+
+MainWindow::~MainWindow() {
+    if (mQNode && mQNode->isRunning()) {
+        mQNode->exit();
+        mQNode->wait();
+    }
 }
 
 void MainWindow::constructMenubar() {
@@ -67,7 +81,6 @@ void MainWindow::constructToolbar(){
     toolBar->addAction(flag);
     toolBar->addAction(mapFix);
 
-    // To Do : fix selectMainWidget function
     connect(viewer, &QAction::triggered, this, [this]() {selectOption(0);});
     connect(flag, &QAction::triggered, this, [this]() {selectOption(1);});
     connect(mapFix, &QAction::triggered, this, [this]() {selectOption(2);});
@@ -109,7 +122,6 @@ void MainWindow::selectOption(int index) {
 void MainWindow::loadPCDFile() {
     QString fileName = QFileDialog::getOpenFileName(nullptr, "Select *.pcd file", ".", "*.pcd");
     if (!fileName.isEmpty()) {
-        // To do : signal-slot based on
         Graphics::pcd_data data;
         Utils::loadPCD(fileName.toStdString(), data);
         DATA::Field field(Utils::getCurrentTimeInSeconds(), DATA::GET_DATA_METHOD::PCD, DATA::DATA_TYPE::POINT_CLOUD, DATA::DATA_STRUCTURE::SEPARATED);
@@ -126,7 +138,7 @@ void MainWindow::constructDockWidget() {
     QStackedWidget *stackedWidget = new QStackedWidget(dockWidget);
 
     QWidget *page1 = new ViewOption(stackedWidget);
-    QWidget *page2 = new QWidget(stackedWidget);
+    QWidget *page2 = new PathOptionWidget(stackedWidget);
 
     stackedWidget->addWidget(page1);
     stackedWidget->addWidget(page2);
