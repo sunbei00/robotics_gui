@@ -25,4 +25,23 @@ namespace Graphics{
     };
 }
 
+namespace Graphics {
+    class TriangleRenderer : public IGraphicalBase {
+    private:
+        static GLuint mProgram;
+        GLuint vao = 0;
+        GLuint vbo = 0;
+        glm::vec3 mColor = glm::vec3(0.0941f, 0.6274f, 0.8431f);
+        std::vector<glm::vec3> mData;
+    protected:
+        GLuint getProgram() override;
+        void genGL() override;
+        void delGL() override;
+    public:
+        explicit TriangleRenderer(const std::vector<glm::vec3>& data, QOpenGLFunctions_4_5_Core* glFunc);
+        ~TriangleRenderer() override;
+        void draw(const InteractionCamera& camera) override;
+    };
+}
+
 #endif //ROBOTICS_GUI_TRIANGLERENDERER_H

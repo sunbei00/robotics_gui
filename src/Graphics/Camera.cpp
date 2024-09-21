@@ -174,6 +174,10 @@ namespace Graphics {
         return glm::perspective(glm::radians(60.0f), (float)tempCamera.rect.x / (float)tempCamera.rect.y, 0.01f, 1000.0f);
     }
 
+    float InteractionCamera::getDistance() const {
+        return glm::length(mCamera.eye - mCamera.cen);
+    }
+
     void InteractionCamera::setWH(glm::vec2 wh) {
         mCamera.rect = wh;
         mTopCamera.rect = wh;

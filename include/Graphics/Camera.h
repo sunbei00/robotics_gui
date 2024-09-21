@@ -47,13 +47,15 @@ namespace Graphics{
         void mouseMoved(glm::vec2 mousePos);
         void mouseWheel(float wheel);
         void move(glm::vec3 movement);
-        glm::vec3 rayCast(glm::vec2 mousePos);
+
+        glm::vec3 rayCast(glm::vec2 mousePos); // Top View Ray Cast - z : 0
 
         bool getIsTopView() const;
         glm::vec3 getEyePos() const;
         glm::vec3 getCenPos() const;
         glm::mat4 getViewMatrix() const;
         glm::mat4 getPerspectiveMatrix() const;
+        float getDistance() const;
     };
 }
 

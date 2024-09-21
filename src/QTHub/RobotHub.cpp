@@ -23,4 +23,8 @@ namespace QTHub{
     void RobotHub::setRobotPose(const RobotPose& current) {
         emit sSetRobotPose(current);
     }
+
+    void RobotHub::sendPath(const std::vector<glm::vec3>& path) {
+        emit sSendPath(path);
+    }
 }

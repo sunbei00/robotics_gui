@@ -77,3 +77,70 @@ namespace Graphics{
         return mProgram;
     }
 }
+
+
+
+
+
+namespace Graphics {
+
+    GLuint TriangleRenderer::mProgram = 0;
+
+    TriangleRenderer::TriangleRenderer(const std::vector<glm::vec3>& data, QOpenGLFunctions_4_5_Core *glFunc)
+        : IGraphicalBase(glFunc), mData(data) {
+        genGL();
+    }
+
+    TriangleRenderer::~TriangleRenderer() {
+        delGL();
+    }
+
+    void TriangleRenderer::delGL() {
+        if (vao != 0)
+            glFunc->glDeleteVertexArrays(1, &vao);
+        if (vbo != 0)
+            glFunc->glDeleteBuffers(1, &vbo);
+        vao = 0;
+        vbo = 0;
+    }
+
+    void TriangleRenderer::genGL() {
+        delGL();
+
+        glFunc->glGenVertexArrays(1, &vao);
+        glFunc->glBindVertexArray(vao);
+
+        glFunc->glGenBuffers(1, &vbo);
+        glFunc->glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glFunc->glBufferData(GL_ARRAY_BUFFER, mData.size() * sizeof(glm::vec3), mData.data(), GL_STATIC_DRAW);
+
+        glFunc->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+        glFunc->glEnableVertexAttribArray(0);
+
+        glFunc->glBindVertexArray(0);
+    }
+
+    void TriangleRenderer::draw(const InteractionCamera& camera) {
+        GLuint shaderProgram = getProgram();
+        glFunc->glUseProgram(shaderProgram);
+        setMVPUniform(camera.getViewMatrix(), camera.getPerspectiveMatrix());
+
+        GLint pointColorLoc = glFunc->glGetUniformLocation(shaderProgram, "triangleColor");
+        glFunc->glUniform3fv(pointColorLoc, 1, &mColor.x);
+
+        glFunc->glBindVertexArray(vao);
+        glFunc->glDrawArrays(GL_TRIANGLES, 0, mData.size());
+
+        glFunc->glBindVertexArray(0);
+        glFunc->glUseProgram(0);
+    }
+
+    GLuint TriangleRenderer::getProgram() {
+        if (mProgram == 0) {
+            vertexShaderSource = Utils::readGLSLFile(shaderPath + "/triangleVertexShaderSource.glsl");
+            fragmentShaderSource = Utils::readGLSLFile(shaderPath + "/triangleFragmentShaderSource.glsl");
+            mProgram = compileProgram();
+        }
+        return mProgram;
+    }
+}

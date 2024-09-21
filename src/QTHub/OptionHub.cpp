@@ -35,5 +35,17 @@ namespace QTHub {
     void OptionHub::selectOptionMenu(int idx) {
         emit sSelectOptionMenu(idx);
     }
+
+    void OptionHub::undoFlag() {
+        emit sUndoFlag();
+    }
+
+    void OptionHub::resetFlag() {
+        emit sResetFlag();
+    }
+
+    void OptionHub::sendFlag() {
+        emit sSendFlag();
+    }
 }
 

@@ -9,8 +9,6 @@
 
 
 QNode::QNode(QObject* parent) : QThread(parent){
-    assert(mMainWindow != nullptr);
-
     int argc = 0;
     char** argv = nullptr;
     rclcpp::init(argc, argv);
@@ -26,8 +24,11 @@ QNode::QNode(QObject* parent) : QThread(parent){
     pointcloud_subscription_ = node->create_subscription<sensor_msgs::msg::PointCloud2>(
             "lio_sam/mapping/cloud_registered", qos, std::bind(&QNode::pointcloud_callback, this, std::placeholders::_1));
 
+    path_publisher_ = node->create_publisher<nav_msgs::msg::Path>("/Planning/local_path", 10);
+
     connect(this, &QNode::sAddPointCloud, QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::addInterleavedPointCloud);
     connect(this, &QNode::sSetRobotPose, QTHub::RobotHub::getSingleton(), &QTHub::RobotHub::setRobotPose);
+    connect(QTHub::RobotHub::getSingleton(), &QTHub::RobotHub::sSendPath, this, &QNode::sendTopic);
 }
 
 void QNode::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
@@ -42,7 +43,6 @@ void QNode::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
 }
 
 void QNode::pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg) {
-    assert(mMainWindow != nullptr);
     std::vector<glm::vec3> cloud_points;
 
     const uint32_t point_step = msg->point_step;
@@ -86,5 +86,26 @@ void QNode::run(){
         // RCLCPP_INFO(node->get_logger(), "loop");
     }
     rclcpp::shutdown();
+}
+
+void QNode::sendTopic(std::vector<glm::vec3> path) {
+
+    rclcpp::Time now = node->now();
+
+    nav_msgs::msg::Path path_msg;
+    path_msg.header.stamp = now;
+    path_msg.header.frame_id = "map";
+    for (const auto &pos : path)
+    {
+        geometry_msgs::msg::PoseStamped pose;
+        pose.header.stamp = now;
+        pose.header.frame_id = "map";
+        pose.pose.position.x = pos.x;
+        pose.pose.position.y = pos.y;
+        pose.pose.position.z = pos.z;
+        pose.pose.orientation.w = 1.0;
+        path_msg.poses.push_back(pose);
+    }
+    path_publisher_->publish(path_msg);
 }
 

@@ -6,9 +6,16 @@
 #define PATHOPTIONWIDGET_H
 #include "QT/IOptionBaseWidget.h"
 
+enum class SEND_CODE {SEND, RESET};
+
 class PathOptionWidget : public IOptionBase{
     Q_OBJECT
 private:
+    SEND_CODE mSendCode = SEND_CODE::RESET;
+
+    QWidget* constructUndoWidget();
+    QWidget* constructSendWidget();
+    QWidget* constructResetWidget();
 
 
 public:
@@ -19,8 +26,9 @@ public:
 
 signals:
     void sTopView(bool isTopView);
-
-
+    void sButtonAvalidable(SEND_CODE sendCode);
+private slots:
+    void sendCode(SEND_CODE code);
 };
 
 

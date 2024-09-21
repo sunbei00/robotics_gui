@@ -27,7 +27,9 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+
 
 
 # Qt
@@ -43,12 +45,12 @@ find_package(assimp REQUIRED)
 
 
 FILE(GLOB SOURCES
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/QT/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/QTHub/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/ROS2/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Definition/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Graphics/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/QTHub/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/ROS2/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/QT/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
@@ -92,7 +94,7 @@ target_link_libraries(gui
 )
 
 
-ament_target_dependencies(gui rclcpp nav_msgs sensor_msgs)
+ament_target_dependencies(gui rclcpp nav_msgs sensor_msgs geometry_msgs)
 
 install(TARGETS
         gui

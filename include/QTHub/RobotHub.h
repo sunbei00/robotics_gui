@@ -28,8 +28,10 @@ namespace QTHub {
 
     signals:
         void sSetRobotPose(RobotPose robotPose);
+        void sSendPath(std::vector<glm::vec3> path);
     public slots:
         void setRobotPose(const RobotPose& current);
+        void sendPath(const std::vector<glm::vec3>& path);
     };
 
 }

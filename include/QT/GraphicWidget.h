@@ -21,12 +21,17 @@ protected:
     RobotPose mRobotPose;
     bool mIsRobotTracking;
     int mSelectedOptionMenu;
+    bool mIsSent = false;
 
     QTimer* mTimer;
     std::vector<std::pair<DATA::Field, Graphics::IGraphicalBase*>> mRenderer{};
     std::pair<DATA::Field, Graphics::IGraphicalBase*> mRobotRenderer;
+    std::pair<DATA::Field, Graphics::IGraphicalBase*> mTriangleRobotRenderer;
+
     std::pair<DATA::Field, Graphics::IGraphicalBase*> mFlagRenderer;
     std::vector<glm::vec3> mFlagLists;
+
+    std::vector<glm::vec3> mPath;
 
 protected:
     void initializeGL() override;
@@ -52,8 +57,12 @@ public slots:
     void addInterleavedPointCloudRenderer(const std::vector<glm::vec3>& pointCloud, DATA::Field field);
     void addSeparatedPointCloudRenderer(const Graphics::pcd_data& pointCloud, DATA::Field field);
 
+    void sendPath();
+
     void clearMap();
 
+signals:
+    void sSendPath(std::vector<glm::vec3>);
 };
 
 
