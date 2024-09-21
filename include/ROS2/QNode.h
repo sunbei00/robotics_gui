@@ -10,7 +10,8 @@
 
 #include "nav_msgs/msg/odometry.hpp"
 #include "sensor_msgs/msg/point_cloud2.hpp"
-#include "Definition/Robot.h"
+#include "QTHub/RobotHub.h"
+#include "QTHub/GraphicHub.h"
 
 class MainWindow;
 
@@ -22,18 +23,16 @@ private:
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_subscription_;
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr pointcloud_subscription_;
 
-    MainWindow* mMainWindow;
 private:
     void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg);
     void pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg);
 
 signals:
-    void receivePointCloud(const std::vector<glm::vec3>& point_cloud);
-    void receiveRobotPose(Robot current);
-
+    void sAddPointCloud(const std::vector<glm::vec3>& point_cloud, DATA::Field field);
+    void sSetRobotPose(RobotPose current);
 
 public:
-    QNode(MainWindow* mainWindow, QObject* parent = nullptr);
+    QNode(QObject* parent = nullptr);
     ~QNode() override = default;
     void run() override;
 };

@@ -9,9 +9,9 @@
 
 #include "QT/MainWindow.h"
 #include "QT/GraphicWidget.h"
+#include "QT/ViewOptionWidget.h"
 #include "Utils/LoadPCD.h"
-#include "Graphics/PointRenderer.h"
-#include "QT/OptionWidget.h"
+#include "Utils/GetTime.h"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     this->mQNode = std::make_shared<QNode>(this);
@@ -25,10 +25,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     constructMainWidget();
     constructDockWidget();
 
-    assert(mainWidget != nullptr);
-    connect(this, &MainWindow::robotMovedIncremental, mainWidget, &OpenGLWidget::moveCamera);
-    connect(this, &MainWindow::robotMoved, mainWidget, &OpenGLWidget::moveRobot);
-    connect(this, &MainWindow::topView, mainWidget, &OpenGLWidget::setTopView);
+    selectOption(0);
+
+    connect(this, &MainWindow::sAddPCD, QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::addSeparatedPointCloud);
 }
 
 void MainWindow::constructMenubar() {
@@ -101,23 +100,24 @@ void MainWindow::selectOption(int index) {
     assert(stackWidget != nullptr);
     stackWidget->setCurrentIndex(index);
 
+    IOptionBase* option = dynamic_cast<IOptionBase*>(stackWidget->currentWidget());
+    assert(option != nullptr);
+    if(option != nullptr)
+        option->selected();
 }
 
 void MainWindow::loadPCDFile() {
     QString fileName = QFileDialog::getOpenFileName(nullptr, "Select *.pcd file", ".", "*.pcd");
     if (!fileName.isEmpty()) {
+        // To do : signal-slot based on
         Graphics::pcd_data data;
         Utils::loadPCD(fileName.toStdString(), data);
-        DATA::Field field(0, DATA::GET_DATA_METHOD::PCD, DATA::DATA_TYPE::POINT_CLOUD);
-        mainWidget->makeCurrent();
-        mainWidget->addRenderer(field, new Graphics::PointRendererSeparatedFiltered(mainWidget, std::move(data)));
-        mainWidget->doneCurrent();
+        DATA::Field field(Utils::getCurrentTimeInSeconds(), DATA::GET_DATA_METHOD::PCD, DATA::DATA_TYPE::POINT_CLOUD, DATA::DATA_STRUCTURE::SEPARATED);
+
+        emit sAddPCD(data, field);
     }
 }
 
-void MainWindow::setRobotTrackingMode(bool isTracking) {
-    mIsRobotTracking = isTracking;
-}
 
 void MainWindow::constructDockWidget() {
     dockWidget = new QDockWidget("Option", this);
@@ -125,7 +125,7 @@ void MainWindow::constructDockWidget() {
 
     QStackedWidget *stackedWidget = new QStackedWidget(dockWidget);
 
-    QWidget *page1 = new ViewOption(this, stackedWidget);
+    QWidget *page1 = new ViewOption(stackedWidget);
     QWidget *page2 = new QWidget(stackedWidget);
 
     stackedWidget->addWidget(page1);
@@ -134,27 +134,6 @@ void MainWindow::constructDockWidget() {
     addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 }
 
-void MainWindow::addPointCloudRenderer(const std::vector<glm::vec3>& point_cloud ) {
-    DATA::Field field(0, DATA::GET_DATA_METHOD::ROS, DATA::DATA_TYPE::POINT_CLOUD);
-    mainWidget->makeCurrent(); // To do : delete this
-    mainWidget->addRenderer(field, new Graphics::PointRendererInterleavedFiltered(mainWidget, point_cloud));
-    mainWidget->doneCurrent();
-}
 
-void MainWindow::setRobotPose(Robot current){
-    assert(mainWidget != nullptr);
-    Robot prev = robot;
-    glm::vec3 movement = current.position - prev.position;
-    if(mIsRobotTracking)
-        emit robotMovedIncremental(movement);
 
-    emit robotMoved(current);
-
-    robot = current;
-}
-
-void MainWindow::setTopView(bool isTopView) {
-    assert(mainWidget != nullptr);
-    emit topView(isTopView);
-}
 

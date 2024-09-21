@@ -4,9 +4,11 @@
 
 #include "ROS2/QNode.h"
 #include "QT/MainWindow.h"
+#include "QTHub/GraphicHub.h"
+#include "Utils/GetTime.h"
 
 
-QNode::QNode(MainWindow* mainWindow, QObject* parent) : QThread(parent), mMainWindow(mainWindow){
+QNode::QNode(QObject* parent) : QThread(parent){
     assert(mMainWindow != nullptr);
 
     int argc = 0;
@@ -24,28 +26,22 @@ QNode::QNode(MainWindow* mainWindow, QObject* parent) : QThread(parent), mMainWi
     pointcloud_subscription_ = node->create_subscription<sensor_msgs::msg::PointCloud2>(
             "lio_sam/mapping/cloud_registered", qos, std::bind(&QNode::pointcloud_callback, this, std::placeholders::_1));
 
-
-    connect(this, &QNode::receivePointCloud, mMainWindow, &MainWindow::addPointCloudRenderer);
-    connect(this, &QNode::receiveRobotPose, mMainWindow, &MainWindow::setRobotPose);
+    connect(this, &QNode::sAddPointCloud, QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::addInterleavedPointCloud);
+    connect(this, &QNode::sSetRobotPose, QTHub::RobotHub::getSingleton(), &QTHub::RobotHub::setRobotPose);
 }
 
-void QNode::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
-{
-    assert(mMainWindow != nullptr);
-    if (mMainWindow == nullptr)
-        return;
+void QNode::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
     auto& positionMsg = msg->pose.pose.position;
     auto& orientationMsg = msg->pose.pose.orientation;
 
-    Robot curr_robot;
+    RobotPose curr_robot;
     curr_robot.position = glm::vec3(positionMsg.x, positionMsg.y, positionMsg.z);
     curr_robot.orientation = glm::quat(orientationMsg.w, orientationMsg.x, orientationMsg.y, orientationMsg.z);
 
-    emit receiveRobotPose(curr_robot);
+    emit sSetRobotPose(curr_robot);
 }
 
-void QNode::pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg)
-{
+void QNode::pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg) {
     assert(mMainWindow != nullptr);
     std::vector<glm::vec3> cloud_points;
 
@@ -76,7 +72,8 @@ void QNode::pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
         cloud_points.emplace_back(x, y, z);
     }
 
-    emit receivePointCloud(cloud_points);
+    DATA::Field field(Utils::getCurrentTimeInSeconds(), DATA::GET_DATA_METHOD::ROS, DATA::DATA_TYPE::POINT_CLOUD, DATA::DATA_STRUCTURE::INTERLEAVED);
+    emit sAddPointCloud(cloud_points, field);
 
     //RCLCPP_INFO(node->get_logger(), "Extracted %zu points", cloud_points.size());
 }

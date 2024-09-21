@@ -4,24 +4,26 @@
 
 #ifndef ROBOTICS_GUI_OPTIONWIDGET_H
 #define ROBOTICS_GUI_OPTIONWIDGET_H
-#include <QWidget>
 
-class MainWindow;
+#include "QT/IOptionBaseWidget.h"
 
-class ViewOption : public QWidget{
+class ViewOption final : public IOptionBase{
     Q_OBJECT
 private:
-    MainWindow* mMainWindow;
-
-    bool mIsTopView = false;
+    bool mIsTopView = true;
     bool mIsRobotTracking = false;
 protected:
     QWidget* constructZFilter();
     QWidget* constructRobotTracking();
     QWidget* constructTopView();
 public:
-    explicit ViewOption(MainWindow* mainWindow, QWidget* parent = nullptr);
-    virtual ~ViewOption();
+    explicit ViewOption(QWidget* parent = nullptr);
+    ~ViewOption() override;
+
+    void selected() override;
+signals:
+    void sSetTracking(bool isRobotTracking);
+    void sTopView(bool isTopView);
 };
 
 

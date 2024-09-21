@@ -43,16 +43,18 @@ find_package(assimp REQUIRED)
 
 
 FILE(GLOB SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/QT/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/QTHub/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/ROS2/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Definition/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Graphics/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
 FILE(GLOB MOC_HEADERS
         "${CMAKE_CURRENT_SOURCE_DIR}/include/QT/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/QTHub/*.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/include/ROS2/*.h"
 )
 

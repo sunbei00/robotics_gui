@@ -8,22 +8,24 @@
 #include <QOpenGLFunctions_4_5_Core>
 #include <QTimer>
 #include "Graphics/IGraphicalBase.h"
+#include "Graphics/PointRenderer.h"
 #include "Graphics/Camera.h"
-#include "Definition/Robot.h"
-#include "Definition/Data.h"
+#include "QTHub/RobotHub.h"
+#include "QTHub/GraphicHub.h"
 
-class OpenGLWidget : public QOpenGLWidget, public QOpenGLFunctions_4_5_Core
-{
+class OpenGLWidget : public QOpenGLWidget, public QOpenGLFunctions_4_5_Core {
 Q_OBJECT
 
 protected:
     Graphics::InteractionCamera mCamera;
+    RobotPose mRobotPose;
+    bool mIsRobotTracking;
 
-    QTimer* timer;
+    QTimer* mTimer;
     std::vector<std::pair<DATA::Field, Graphics::IGraphicalBase*>> mRenderer;
     std::pair<DATA::Field, Graphics::IGraphicalBase*> mRobotRenderer;
     std::pair<DATA::Field, Graphics::IGraphicalBase*> mFlagRenderer;
-    std::vector<glm::vec3> flagLists;
+    std::vector<glm::vec3> mFlagLists;
 
 protected:
     void initializeGL() override;
@@ -39,15 +41,17 @@ public:
     explicit OpenGLWidget(QWidget *parent = nullptr);
     ~OpenGLWidget() override;
 
-    void addRenderer(DATA::Field field, Graphics::IGraphicalBase* renderer);
 
+private slots:
+    void widgetUpdate();
 
 public slots:
-    void widgetUpdate();
-    void moveCamera(glm::vec3 movement);
-    void moveRobot(Robot current);
+    void setRobotPose(RobotPose current);
     void setTopView(bool isTopView);
+    void setRobotTracking(bool isRobotTracking);
 
+    void addInterleavedPointCloudRenderer(const std::vector<glm::vec3>& pointCloud, DATA::Field field);
+    void addSeparatedPointCloudRenderer(const Graphics::pcd_data& pointCloud, DATA::Field field);
 
 };
 

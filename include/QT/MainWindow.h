@@ -7,19 +7,16 @@
 #include <QMainWindow>
 #include "ROS2/QNode.h"
 #include "QT/GraphicWidget.h"
+#include "QTHub/GraphicHub.h"
 
 
 class MainWindow : public QMainWindow{
     Q_OBJECT
-private: // for qt communication
-    bool mIsRobotTracking;
 private: // ros
     std::shared_ptr<QNode> mQNode;
 private: // qt
     OpenGLWidget* mainWidget;
     QDockWidget* dockWidget;
-private:
-    Robot robot;
 private: // method
     void constructMenubar();
     void constructMainWidget();
@@ -27,19 +24,13 @@ private: // method
     void constructDockWidget();
     void setFullDisplay();
 
-private slots:
     void selectOption(int index);
+
+private slots:
     void loadPCDFile();
-public slots:
-    void setRobotTrackingMode(bool isTracking);
-    void addPointCloudRenderer(const std::vector<glm::vec3>& point_cloud);
-    void setRobotPose(Robot current);
-    void setTopView(bool isTopView);
 
 signals:
-    void robotMovedIncremental(glm::vec3 movement);
-    void robotMoved(Robot pose);
-    void topView(bool isTopView);
+    void sAddPCD(const Graphics::pcd_data& pointCloud, DATA::Field field);
 
 public:
     explicit MainWindow(QWidget* parent = nullptr);

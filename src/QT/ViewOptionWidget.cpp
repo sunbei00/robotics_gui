@@ -7,14 +7,14 @@
 #include <QLabel>
 #include <QCheckBox>
 
-#include "QT/OptionWidget.h"
+#include "QTHub/OptionHub.h"
+#include "QT/ViewOptionWidget.h"
 #include "QT/MainWindow.h"
 #include "Graphics/IGraphicalBase.h"
 
-ViewOption::ViewOption(MainWindow* mainWindow, QWidget *parent) : QWidget(parent), mMainWindow(mainWindow){
-    assert(mMainWindow != nullptr);
 
-    QVBoxLayout* All = new QVBoxLayout();
+ViewOption::ViewOption(QWidget *parent) : IOptionBase(parent){
+    QVBoxLayout* All = new QVBoxLayout(this);
 
     All->addWidget(constructZFilter());
     All->addWidget(constructRobotTracking());
@@ -23,6 +23,10 @@ ViewOption::ViewOption(MainWindow* mainWindow, QWidget *parent) : QWidget(parent
     All->addStretch();
 
     setLayout(All);
+
+    auto* optionHub = QTHub::OptionHub::getSingleton();
+    connect(this, &ViewOption::sSetTracking, optionHub, &QTHub::OptionHub::setRobotTracking);
+    connect(this, &ViewOption::sTopView, optionHub, &QTHub::OptionHub::setTopView);
 }
 
 QWidget* ViewOption::constructZFilter() {
@@ -117,15 +121,10 @@ QWidget* ViewOption::constructRobotTracking() {
 
     QLabel* trackingLabel = new QLabel("Tracking Mode: ", robotTrackingWidget);
     QCheckBox* trackingMode = new QCheckBox(robotTrackingWidget);
-    connect(trackingMode, &QCheckBox::toggled, mMainWindow, &MainWindow::setRobotTrackingMode);
-    if(mIsRobotTracking) {
-        trackingMode->setCheckState(Qt::CheckState::Checked);
-        emit trackingMode->toggled(true);
-    }
-    else {
-        trackingMode->setCheckState(Qt::CheckState::Unchecked);
-        emit trackingMode->toggled(false);
-    }
+    connect(trackingMode, &QCheckBox::toggled, QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::setRobotTracking);
+    connect(trackingMode, &QCheckBox::toggled, this, [this](bool checked){mIsRobotTracking = checked;});
+    trackingMode->setCheckState(mIsRobotTracking ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+    emit sSetTracking(mIsRobotTracking);
 
     robotTrackingLayout->addWidget(trackingLabel);
     robotTrackingLayout->addWidget(trackingMode);
@@ -140,16 +139,10 @@ QWidget* ViewOption::constructTopView() {
 
     QLabel* topViewLabel = new QLabel("Top View Mode: ", topViewWidget);
     QCheckBox* topViewMode = new QCheckBox(topViewWidget);
-    connect(topViewMode, &QCheckBox::toggled, mMainWindow, &MainWindow::setTopView);
-    if(mIsTopView) {
-        topViewMode->setCheckState(Qt::CheckState::Checked);
-        emit topViewMode->toggled(true);
-    }
-    else {
-        topViewMode->setCheckState(Qt::CheckState::Unchecked);
-        emit topViewMode->toggled(false);
-    }
-
+    connect(topViewMode, &QCheckBox::toggled, QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::setTopView);
+    connect(topViewMode, &QCheckBox::toggled, this, [this](bool checked) {mIsTopView = checked;});
+    topViewMode->setCheckState(mIsTopView ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+    emit sTopView(mIsTopView);
 
     topViewLayout->addWidget(topViewLabel);
     topViewLayout->addWidget(topViewMode);
@@ -158,3 +151,8 @@ QWidget* ViewOption::constructTopView() {
 }
 
 ViewOption::~ViewOption() = default;
+
+void ViewOption::selected() {
+    emit sSetTracking(mIsRobotTracking);
+    emit sTopView(mIsTopView);
+}

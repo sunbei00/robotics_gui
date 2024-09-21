@@ -2,26 +2,36 @@
 // Created by root on 9/12/24.
 //
 
+#include <gtc/quaternion.hpp>
+#include <QMouseEvent>
+#include <chrono>
+
+#include "QTHub/OptionHub.h"
+#include "QTHub/RobotHub.h"
 #include "QT/GraphicWidget.h"
 #include "Utils/LoadPCD.h"
-
-#include <glm.hpp>
-#include <QMouseEvent>
-#include <gtc/quaternion.hpp>
-
 #include "Graphics/PointRenderer.h"
 #include "Graphics/TriangleRenderer.h"
 
 OpenGLWidget::OpenGLWidget(QWidget *parent)
         : QOpenGLWidget(parent), mRobotRenderer(DATA::Field(),nullptr){
-    timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &OpenGLWidget::widgetUpdate);
-    timer->start(16); // 60 fps
+    mTimer = new QTimer(this);
+    connect(mTimer, &QTimer::timeout, this, &OpenGLWidget::widgetUpdate);
+    mTimer->start(16); // 60 fps
+
+    connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sTopView, this, &OpenGLWidget::setTopView);
+    connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sRobotTracking, this, &OpenGLWidget::setRobotTracking);
+
+    connect(QTHub::RobotHub::getSingleton(), &QTHub::RobotHub::sSetRobotPose, this, &OpenGLWidget::setRobotPose);
+
+    connect(QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::sAddSeparatedPointCloud, this, &OpenGLWidget::addSeparatedPointCloudRenderer);
+    connect(QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::sAddInterleavedPointCloud, this, &OpenGLWidget::addInterleavedPointCloudRenderer);
 }
 
 OpenGLWidget::~OpenGLWidget() {
-    timer->stop();
-    delete timer;
+    while(mTimer->isActive()){} // To do : Test, is Run !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    mTimer->stop();
+    delete mTimer;
 
     makeCurrent();
     for(auto& it : mRenderer)
@@ -60,7 +70,7 @@ void OpenGLWidget::paintGL() {
 
     mRobotRenderer.second->draw(mCamera);
 
-    for(glm::vec3 pos : flagLists) {
+    for(glm::vec3 pos : mFlagLists) {
         mFlagRenderer.second->modelMatrix = glm::scale(glm::translate(glm::mat4(1.0f), pos), glm::vec3(0.5f, 0.5f, 0.5f));
         mFlagRenderer.second->draw(mCamera);
     }
@@ -73,7 +83,7 @@ void OpenGLWidget::mousePressEvent(QMouseEvent* event) {
 
     // To do : Add if Path Mode Condition
     if(mCamera.getIsTopView() && event->button() == Qt::RightButton)
-        flagLists.push_back(mCamera.rayCast(glm::vec2(event->pos().x(), event->pos().y())));
+        mFlagLists.push_back(mCamera.rayCast(glm::vec2(event->pos().x(), event->pos().y())));
 }
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent* event) {
@@ -93,22 +103,43 @@ void OpenGLWidget::widgetUpdate() {
     update();
 }
 
-void OpenGLWidget::addRenderer(DATA::Field field, Graphics::IGraphicalBase* renderer) {
-    mRenderer.push_back({field, renderer});
-}
-
-void OpenGLWidget::moveCamera(glm::vec3 movement) {
-        mCamera.move(movement);
-}
-
-void OpenGLWidget::moveRobot(Robot current) {
-    // robot obj model error
+void OpenGLWidget::setRobotPose(RobotPose current) {
+    // model axis align
     glm::mat4 modelRotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
     mRobotRenderer.second->modelMatrix = glm::translate(glm::mat4(1.0f), current.position) * glm::mat4_cast(current.orientation) * modelRotate;
+
+
+    RobotPose prev = mRobotPose;
+    glm::vec3 movement = current.position - prev.position;
+
+    if(mIsRobotTracking)
+        mCamera.move(movement);
+    mRobotPose = current;
 }
 
 void OpenGLWidget::setTopView(bool isTopView) {
     mCamera.setTopView(isTopView);
 }
+
+void OpenGLWidget::setRobotTracking(bool isRobotTracking) {
+    mIsRobotTracking = isRobotTracking;
+}
+
+void OpenGLWidget::addInterleavedPointCloudRenderer(const std::vector<glm::vec3>& pointCloud, DATA::Field field) {
+    assert(field.mType == DATA::DATA_TYPE::POINT_CLOUD);
+    assert(field.mDataStructure == DATA::DATA_STRUCTURE::INTERLEAVED);
+    makeCurrent();
+    mRenderer.push_back({field, new Graphics::PointRendererInterleavedFiltered(this, pointCloud)});
+    doneCurrent();
+}
+
+void OpenGLWidget::addSeparatedPointCloudRenderer(const Graphics::pcd_data& pointCloud, DATA::Field field) {
+    assert(field.mType == DATA::DATA_TYPE::POINT_CLOUD);
+    assert(field.mDataStructure == DATA::DATA_STRUCTURE::SEPARATED);
+    makeCurrent();
+    mRenderer.push_back({field, new Graphics::PointRendererSeparatedFiltered(this, pointCloud)});
+    doneCurrent();
+}
+
 
