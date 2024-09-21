@@ -22,6 +22,7 @@ protected:
     QTimer* timer;
     std::vector<std::pair<DATA::Field, Graphics::IGraphicalBase*>> mRenderer;
     std::pair<DATA::Field, Graphics::IGraphicalBase*> mRobotRenderer;
+    std::pair<DATA::Field, Graphics::IGraphicalBase*> mFlagRenderer;
 
 protected:
     void initializeGL() override;

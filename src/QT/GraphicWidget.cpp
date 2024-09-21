@@ -34,13 +34,20 @@ OpenGLWidget::~OpenGLWidget() {
 void OpenGLWidget::initializeGL() {
     initializeOpenGLFunctions();
     glEnable(GL_PROGRAM_POINT_SIZE);
+    glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.188235294, 0.188235294, 0.188235294, 1.0f);
 
-    DATA::Field field(0, DATA::GET_DATA_METHOD::OBJ, DATA::DATA_TYPE::ROBOT);
-    mRobotRenderer = {field, new Graphics::OBJLoaderTriangleRenderer(Graphics::OBJLoader::meshPath + "/scoutmini.obj" ,this)};
+    DATA::Field robotField(0, DATA::GET_DATA_METHOD::OBJ, DATA::DATA_TYPE::ROBOT);
+    DATA::Field flagField(0, DATA::GET_DATA_METHOD::OBJ, DATA::DATA_TYPE::MESH);
+    mRobotRenderer = {robotField, new Graphics::OBJLoaderTriangleRenderer(Graphics::OBJLoader::meshPath + "/scoutmini.obj" ,this)};
+    mFlagRenderer = {flagField, new Graphics::OBJLoaderTriangleRenderer(Graphics::OBJLoader::meshPath + "/RedFlag.obj" ,this)};
+
+
+
+
 }
 
 void OpenGLWidget::resizeGL(int w, int h) {
@@ -54,6 +61,7 @@ void OpenGLWidget::paintGL() {
         it.second->draw(mCamera);
 
     mRobotRenderer.second->draw(mCamera);
+    mFlagRenderer.second->draw(mCamera);
 }
 
 void OpenGLWidget::mousePressEvent(QMouseEvent* event) {

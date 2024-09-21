@@ -130,9 +130,9 @@ namespace Graphics {
     glm::mat4 InteractionCamera::getViewMatrix() const{
         Camera tempCamera = mIsTopView ? mTopCamera : mCamera;
 
-        glm::vec3 map_up = glm::vec3(0,0,1);
-        return glm::lookAt(tempCamera.eye, tempCamera.cen, (mIsTopView) ? tempCamera.up : map_up);
-        //return glm::lookAt(tempCamera.eye, tempCamera.cen, tempCamera.up);
+        //glm::vec3 map_up = glm::vec3(0,0,1);
+        //return glm::lookAt(tempCamera.eye, tempCamera.cen, (mIsTopView) ? tempCamera.up : map_up);
+        return glm::lookAt(tempCamera.eye, tempCamera.cen, tempCamera.up);
     }
 
     glm::vec3 InteractionCamera::getEyePos() const{
