@@ -47,6 +47,7 @@ namespace Graphics{
         void mouseMoved(glm::vec2 mousePos);
         void mouseWheel(float wheel);
         void move(glm::vec3 movement);
+        glm::vec3 rayCast(glm::vec2 mousePos);
 
         bool getIsTopView() const;
         glm::vec3 getEyePos() const;

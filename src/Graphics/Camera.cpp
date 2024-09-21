@@ -66,6 +66,33 @@ namespace Graphics {
             rotInteraction(mousePos);
         mMousePos = mousePos;
     }
+
+    glm::vec3 InteractionCamera::rayCast(glm::vec2 mousePos) {
+        assert(mIsTopView);
+
+        glm::mat4 view = getViewMatrix();
+        glm::mat4 perspective = getPerspectiveMatrix();
+
+        float x = (2.0f * mousePos.x) / mTopCamera.rect.x - 1.0f;
+        float y = 1.0f - (2.0f * mousePos.y) / mTopCamera.rect.y;
+        float z = 1.0f;
+        glm::vec3 ray_nds = glm::vec3(x, y, z);
+
+        glm::vec4 ray_clip = glm::vec4(ray_nds, 1.0);
+
+        glm::vec4 ray_eye = glm::inverse(perspective) * ray_clip;
+        ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
+
+        glm::vec3 ray_wor = glm::vec3(glm::inverse(view) * ray_eye);
+        glm::vec3 ray_direction  = glm::normalize(ray_wor);
+
+        glm::vec3 ray_origin = mTopCamera.eye;
+
+        float t = (0 - ray_origin.z) / ray_direction.z;
+        glm::vec3 intersection = ray_origin + t * ray_direction;
+        return intersection;
+    }
+
     void InteractionCamera::moveInteraction(glm::vec2 mousePos){
         const float speed = mTranslationSpeed * 0.0004f * glm::length(mCamera.eye - mCamera.cen); // 좌클릭 이동 속도 조절
 

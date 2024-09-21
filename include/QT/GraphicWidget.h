@@ -23,6 +23,7 @@ protected:
     std::vector<std::pair<DATA::Field, Graphics::IGraphicalBase*>> mRenderer;
     std::pair<DATA::Field, Graphics::IGraphicalBase*> mRobotRenderer;
     std::pair<DATA::Field, Graphics::IGraphicalBase*> mFlagRenderer;
+    std::vector<glm::vec3> flagLists;
 
 protected:
     void initializeGL() override;
@@ -39,6 +40,7 @@ public:
     ~OpenGLWidget() override;
 
     void addRenderer(DATA::Field field, Graphics::IGraphicalBase* renderer);
+
 
 public slots:
     void widgetUpdate();

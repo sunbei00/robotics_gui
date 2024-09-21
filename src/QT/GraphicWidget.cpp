@@ -28,6 +28,7 @@ OpenGLWidget::~OpenGLWidget() {
         delete it.second;
 
     delete mRobotRenderer.second;
+    delete mFlagRenderer.second;
     doneCurrent();
 }
 
@@ -45,9 +46,6 @@ void OpenGLWidget::initializeGL() {
     mRobotRenderer = {robotField, new Graphics::OBJLoaderTriangleRenderer(Graphics::OBJLoader::meshPath + "/scoutmini.obj" ,this)};
     mFlagRenderer = {flagField, new Graphics::OBJLoaderTriangleRenderer(Graphics::OBJLoader::meshPath + "/RedFlag.obj" ,this)};
 
-
-
-
 }
 
 void OpenGLWidget::resizeGL(int w, int h) {
@@ -61,17 +59,25 @@ void OpenGLWidget::paintGL() {
         it.second->draw(mCamera);
 
     mRobotRenderer.second->draw(mCamera);
-    mFlagRenderer.second->draw(mCamera);
+
+    for(glm::vec3 pos : flagLists) {
+        mFlagRenderer.second->modelMatrix = glm::scale(glm::translate(glm::mat4(1.0f), pos), glm::vec3(0.5f, 0.5f, 0.5f));
+        mFlagRenderer.second->draw(mCamera);
+    }
+
 }
 
 void OpenGLWidget::mousePressEvent(QMouseEvent* event) {
     mCamera.mousePressed(event->button() == Qt::LeftButton, event->button() == Qt::RightButton,
                          { event->pos().x(),  event->pos().y()});
+
+    // To do : Add if Path Mode Condition
+    if(mCamera.getIsTopView() && event->button() == Qt::RightButton)
+        flagLists.push_back(mCamera.rayCast(glm::vec2(event->pos().x(), event->pos().y())));
 }
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent* event) {
     mCamera.mouseMoved({event->pos().x(), event->pos().y()});
-
 }
 
 void OpenGLWidget::mouseReleaseEvent(QMouseEvent*) {
