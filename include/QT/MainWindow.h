@@ -31,6 +31,7 @@ private slots:
 
 signals:
     void sAddPCD(const Graphics::pcd_data& pointCloud, DATA::Field field);
+    void sSelectOptionMenu(int idx);
 
 public:
     explicit MainWindow(QWidget* parent = nullptr);

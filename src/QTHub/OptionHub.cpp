@@ -31,5 +31,9 @@ namespace QTHub {
     void OptionHub::clearMap() {
         emit sClearMap();
     }
+
+    void OptionHub::selectOptionMenu(int idx) {
+        emit sSelectOptionMenu(idx);
+    }
 }
 

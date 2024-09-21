@@ -20,9 +20,10 @@ protected:
     Graphics::InteractionCamera mCamera;
     RobotPose mRobotPose;
     bool mIsRobotTracking;
+    int mSelectedOptionMenu;
 
     QTimer* mTimer;
-    std::vector<std::pair<DATA::Field, Graphics::IGraphicalBase*>> mRenderer;
+    std::vector<std::pair<DATA::Field, Graphics::IGraphicalBase*>> mRenderer{};
     std::pair<DATA::Field, Graphics::IGraphicalBase*> mRobotRenderer;
     std::pair<DATA::Field, Graphics::IGraphicalBase*> mFlagRenderer;
     std::vector<glm::vec3> mFlagLists;
@@ -47,8 +48,6 @@ private slots:
 
 public slots:
     void setRobotPose(RobotPose current);
-    void setTopView(bool isTopView);
-    void setRobotTracking(bool isRobotTracking);
 
     void addInterleavedPointCloudRenderer(const std::vector<glm::vec3>& pointCloud, DATA::Field field);
     void addSeparatedPointCloudRenderer(const Graphics::pcd_data& pointCloud, DATA::Field field);

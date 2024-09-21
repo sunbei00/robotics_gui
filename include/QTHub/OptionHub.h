@@ -21,10 +21,12 @@ namespace QTHub {
         void sTopView(bool isTopView);
         void sRobotTracking(bool isTrackingMode);
         void sClearMap();
+        void sSelectOptionMenu(int idx);
     public slots:
         void setTopView(bool isTopView);
         void setRobotTracking(bool isTracking);
         void clearMap();
+        void selectOptionMenu(int idx);
     };
 
 }

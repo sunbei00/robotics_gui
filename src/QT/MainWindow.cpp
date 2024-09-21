@@ -32,6 +32,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     connect(this, &MainWindow::sAddPCD, QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::addSeparatedPointCloud);
 
+    connect(this, &MainWindow::sAddPCD, QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::addSeparatedPointCloud);
+
     QTHub::GraphicHub::getSingleton()->setHubParent(this);
     QTHub::OptionHub::getSingleton()->setHubParent(this);
     QTHub::RobotHub::getSingleton()->setHubParent(this);
@@ -117,6 +119,8 @@ void MainWindow::selectOption(int index) {
     assert(option != nullptr);
     if(option != nullptr)
         option->selected();
+
+    emit sSelectOptionMenu(index);
 }
 
 void MainWindow::loadPCDFile() {

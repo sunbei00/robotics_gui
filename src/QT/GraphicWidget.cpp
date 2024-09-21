@@ -10,17 +10,19 @@
 #include "QTHub/RobotHub.h"
 #include "QT/GraphicWidget.h"
 #include "Utils/LoadPCD.h"
+#include "Utils/GetTime.h"
 #include "Graphics/PointRenderer.h"
 #include "Graphics/TriangleRenderer.h"
 
 OpenGLWidget::OpenGLWidget(QWidget *parent)
-        : QOpenGLWidget(parent), mRobotRenderer(DATA::Field(),nullptr){
+        : QOpenGLWidget(parent), mSelectedOptionMenu(0), mRobotRenderer(DATA::Field(),nullptr){
     mTimer = new QTimer(this);
     connect(mTimer, &QTimer::timeout, this, &OpenGLWidget::widgetUpdate);
     mTimer->start(16); // 60 fps
 
-    connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sTopView, this, &OpenGLWidget::setTopView);
-    connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sRobotTracking, this, &OpenGLWidget::setRobotTracking);
+    connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sTopView, this, [this](bool isTopView){mCamera.setTopView(isTopView);});
+    connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sRobotTracking, this, [this](bool isRobotTracking){ mIsRobotTracking = isRobotTracking;});
+    connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sSelectOptionMenu, this, [this](int idx){mSelectedOptionMenu = idx;});
     connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sClearMap, this, &OpenGLWidget::clearMap);
 
     connect(QTHub::RobotHub::getSingleton(), &QTHub::RobotHub::sSetRobotPose, this, &OpenGLWidget::setRobotPose);
@@ -51,8 +53,8 @@ void OpenGLWidget::initializeGL() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.188235294, 0.188235294, 0.188235294, 1.0f);
 
-    DATA::Field robotField(0, DATA::GET_DATA_METHOD::OBJ, DATA::DATA_TYPE::ROBOT);
-    DATA::Field flagField(0, DATA::GET_DATA_METHOD::OBJ, DATA::DATA_TYPE::MESH);
+    DATA::Field robotField(Utils::getCurrentTimeInSeconds(), DATA::GET_DATA_METHOD::OBJ, DATA::DATA_TYPE::ROBOT, DATA::DATA_STRUCTURE::BLENDER);
+    DATA::Field flagField(Utils::getCurrentTimeInSeconds(), DATA::GET_DATA_METHOD::OBJ, DATA::DATA_TYPE::MESH, DATA::DATA_STRUCTURE::BLENDER);
     mRobotRenderer = {robotField, new Graphics::OBJLoaderTriangleRenderer(Graphics::OBJLoader::meshPath + "/scoutmini.obj" ,this)};
     mFlagRenderer = {flagField, new Graphics::OBJLoaderTriangleRenderer(Graphics::OBJLoader::meshPath + "/RedFlag.obj" ,this)};
 
@@ -116,14 +118,6 @@ void OpenGLWidget::setRobotPose(RobotPose current) {
     if(mIsRobotTracking)
         mCamera.move(movement);
     mRobotPose = current;
-}
-
-void OpenGLWidget::setTopView(bool isTopView) {
-    mCamera.setTopView(isTopView);
-}
-
-void OpenGLWidget::setRobotTracking(bool isRobotTracking) {
-    mIsRobotTracking = isRobotTracking;
 }
 
 void OpenGLWidget::addInterleavedPointCloudRenderer(const std::vector<glm::vec3>& pointCloud, DATA::Field field) {
