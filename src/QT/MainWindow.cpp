@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     connect(this, &MainWindow::sAddPCD, QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::addSeparatedPointCloud);
 
-    connect(this, &MainWindow::sAddPCD, QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::addSeparatedPointCloud);
+    connect(this, &MainWindow::sSelectOptionMenu, QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::selectOptionMenu);
 
     QTHub::GraphicHub::getSingleton()->setHubParent(this);
     QTHub::OptionHub::getSingleton()->setHubParent(this);
@@ -40,10 +40,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 }
 
 MainWindow::~MainWindow() {
-    if (mQNode && mQNode->isRunning()) {
+    if (mQNode && mQNode->isRunning())
         mQNode->exit();
-        mQNode->wait();
-    }
 }
 
 void MainWindow::constructMenubar() {
@@ -117,8 +115,7 @@ void MainWindow::selectOption(int index) {
 
     IOptionBase* option = dynamic_cast<IOptionBase*>(stackWidget->currentWidget());
     assert(option != nullptr);
-    if(option != nullptr)
-        option->selected();
+    option->selected();
 
     emit sSelectOptionMenu(index);
 }

@@ -17,6 +17,8 @@ public:
 
     void selected() override;
 
+signals:
+    void sTopView(bool isTopView);
 
 
 };

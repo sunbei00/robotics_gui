@@ -5,15 +5,13 @@
 #include "QT/PathOptionWidget.h"
 
 #include <QVBoxLayout>
+#include <QTHub/OptionHub.h>
 
 PathOptionWidget::PathOptionWidget(QWidget* parent) : IOptionBase(parent) {
+    auto* optionHub = QTHub::OptionHub::getSingleton();
+    connect(this, &PathOptionWidget::sTopView, optionHub, &QTHub::OptionHub::setTopView);
 
 
-}
-
-PathOptionWidget::~PathOptionWidget() = default;
-
-void PathOptionWidget::selected() {
     QVBoxLayout* All = new QVBoxLayout(this);
 
 
@@ -21,6 +19,13 @@ void PathOptionWidget::selected() {
 
     All->addStretch();
     setLayout(All);
+
+}
+
+PathOptionWidget::~PathOptionWidget() = default;
+
+void PathOptionWidget::selected() {
+    emit sTopView(true);
 }
 
 
