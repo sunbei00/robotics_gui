@@ -108,7 +108,8 @@ void OpenGLWidget::paintGL() {
         for(glm::vec3 FlagPos : mFlagLists)
             vertices.push_back(FlagPos);
 
-        mPath = mIsSent ? mPath : Utils::sampleCatmullRomSpline(vertices, 20);
+        //mPath = mIsSent ? mPath : Utils::sampleCatmullRomSpline(vertices, 20);
+        mPath = Utils::sampleCatmullRomSpline(vertices, 20);
 
         Graphics::IGraphicalBase* lineRenderer = new Graphics::LineRenderer(mPath, this);
 

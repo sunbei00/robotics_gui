@@ -81,6 +81,7 @@ QWidget* PathOptionWidget::constructUndoWidget() {
 
     return widget;
 }
+
 QWidget* PathOptionWidget::constructSendWidget() {
     QWidget* widget = new QWidget(this);
     QHBoxLayout* layout = new QHBoxLayout();
@@ -90,7 +91,7 @@ QWidget* PathOptionWidget::constructSendWidget() {
     sendButton->setText("Send");
     connect(sendButton, &QPushButton::clicked, QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sendFlag);
     connect(sendButton, &QPushButton::clicked, this, [this](){sendCode(SEND_CODE::SEND);});
-    connect(this, &PathOptionWidget::sButtonAvalidable, sendButton, [=](SEND_CODE sendCode){ if(sendCode==SEND_CODE::SEND) sendButton->setEnabled(false); else sendButton->setEnabled(true);} );
+    // connect(this, &PathOptionWidget::sButtonAvalidable, sendButton, [=](SEND_CODE sendCode){ if(sendCode==SEND_CODE::SEND) sendButton->setEnabled(false); else sendButton->setEnabled(true);} );
 
     layout->addWidget(sendButton);
 
