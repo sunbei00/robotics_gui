@@ -28,10 +28,10 @@ mkdir 3rdParty
 cd 3rdParty
 
 # sudo apt-get install qt6-base-dev
-wget https://download.qt.io/archive/qt/6.5/6.5.3/single/qt-everywhere-src-6.5.3.tar.xz
-tar -xf qt-everywhere-src-6.5.3.tar.xz
-rm qt-everywhere-src-6.5.3.tar.xz
-cd qt-everywhere-src-6.5.3
+wget https://download.qt.io/archive/qt/6.5/6.5.3/submodules/qtbase-everywhere-src-6.5.3.tar.xz
+tar -xf qtbase-everywhere-src-6.5.3.tar.xz
+rm qtbase-everywhere-src-6.5.3.tar.xz
+cd qtbase-everywhere-src-6.5.3
 mkdir build
 cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=../../Qt6 \
@@ -45,7 +45,7 @@ cmake .. -DCMAKE_INSTALL_PREFIX=../../Qt6 \
  -DFEATURE_xkbcommon-x11=ON
 make -j6 && make install
 cd ../..
-rm -r qt-everywhere-src-6.5.3
+rm -r qtbase-everywhere-src-6.5.3
 
 
 # sudo apt-get install libassimp-dev

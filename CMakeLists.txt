@@ -33,7 +33,7 @@ find_package(sensor_msgs REQUIRED)
 
 
 # Qt
-set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Qt6/lib/cmake/Qt6;${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Qt6/lib/cmake;${CMAKE_PREFIX_PATH}")
+set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Qt6/lib/cmake/Qt6;${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Qt6/lib/cmake;${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Qt6/lib/cmake/Qt6OpenGLWidgets;${CMAKE_PREFIX_PATH}")
 find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui OpenGL OpenGLWidgets)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
