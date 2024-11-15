@@ -47,5 +47,13 @@ namespace QTHub {
     void OptionHub::sendFlag() {
         emit sSendFlag();
     }
+
+    void OptionHub::savePath() {
+        emit sSaveFlag();
+    }
+
+    void OptionHub::loadPath() {
+        emit sLoadFlag();
+    }
 }
 

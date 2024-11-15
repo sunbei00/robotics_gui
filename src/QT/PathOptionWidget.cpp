@@ -1,12 +1,7 @@
-//
-// Created by root on 9/21/24.
-//
-
 
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QShortcut>
-#include <QFileDialog>
 
 #include "QT/PathOptionWidget.h"
 #include "QTHub/OptionHub.h"
@@ -24,6 +19,7 @@ PathOptionWidget::PathOptionWidget(QWidget* parent) : IOptionBase(parent) {
     All->addWidget(constructSendWidget());
     All->addWidget(constructResetWidget());
     All->addWidget(constructSavePathWidget());
+    All->addWidget(constructLoadPathWidget());
 
 
     All->addStretch();
@@ -40,27 +36,23 @@ QWidget* PathOptionWidget::constructSavePathWidget(){
 
     QPushButton* pathSaveButton = new QPushButton(widget);
     pathSaveButton->setText("save path");
-    connect(pathSaveButton, &QPushButton::clicked, [](){
-        QString filePath = QFileDialog::getSaveFileName(
-                nullptr,
-                "Save File",
-                QDir::homePath(),
-                "Text Files (*.txt);;All Files (*.*)"
-        );
-
-        if (!filePath.isEmpty()) {
-
-            QFile file(filePath);
-            if (file.open(QIODevice::WriteOnly)) {
-                QTextStream stream(&file);
-                stream << "Test";
-
-                file.close();
-            }
-        }
-    });
+    connect(pathSaveButton, &QPushButton::clicked, QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::savePath);
 
     layout->addWidget(pathSaveButton);
+
+    return widget;
+}
+
+QWidget* PathOptionWidget::constructLoadPathWidget(){
+    QWidget* widget = new QWidget(this);
+    QHBoxLayout* layout = new QHBoxLayout();
+    widget->setLayout(layout);
+
+    QPushButton* pathLoadButton = new QPushButton(widget);
+    pathLoadButton->setText("load path");
+    connect(pathLoadButton, &QPushButton::clicked, QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::loadPath);
+
+    layout->addWidget(pathLoadButton);
 
     return widget;
 }

@@ -4,6 +4,7 @@
 
 #include <gtc/quaternion.hpp>
 #include <QMouseEvent>
+#include <QFileDialog>
 #include <chrono>
 
 #include "Utils/CatmullRomSplineInterporation.h"
@@ -32,12 +33,15 @@ OpenGLWidget::OpenGLWidget(QWidget *parent)
     connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sUndoFlag, this, [this](){if(!mFlagLists.empty()) mFlagLists.pop_back();});
     connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sSendFlag, this, &OpenGLWidget::sendPath);
     connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sResetFlag, this, [this](){mFlagLists.clear(); mIsSent=false;});
+    connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sSaveFlag, this, &OpenGLWidget::savePath);
+    connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sLoadFlag, this, &OpenGLWidget::loadPath);
 
     connect(QTHub::RobotHub::getSingleton(), &QTHub::RobotHub::sSetRobotPose, this, &OpenGLWidget::setRobotPose);
     connect(this, &OpenGLWidget::sSendPath ,QTHub::RobotHub::getSingleton(), &QTHub::RobotHub::sendPath);
 
     connect(QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::sAddSeparatedPointCloud, this, &OpenGLWidget::addSeparatedPointCloudRenderer);
     connect(QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::sAddInterleavedPointCloud, this, &OpenGLWidget::addInterleavedPointCloudRenderer);
+
 }
 
 OpenGLWidget::~OpenGLWidget() {
@@ -210,4 +214,73 @@ void OpenGLWidget::clearMap() {
     mRenderer.clear();
 }
 
+void OpenGLWidget::savePath() {
+    QString filePath = QFileDialog::getSaveFileName(
+            nullptr,
+            "Save Flag List",
+            QDir::homePath(),
+            "Path Files (*.path);;All Files (*.*)"
+    );
 
+    if (!filePath.isEmpty()) {
+        if (!filePath.endsWith(".path", Qt::CaseInsensitive)) {
+            filePath += ".path";
+        }
+
+        QFile file(filePath);
+        if (file.open(QIODevice::WriteOnly)) {
+            QTextStream stream(&file);
+
+            for (const auto& flag : mFlagLists)
+                stream << flag.x << " " << flag.y << " " << flag.z << "\n";
+            file.close();
+        }
+    }
+}
+
+
+void OpenGLWidget::loadPath() {
+    QString filePath = QFileDialog::getOpenFileName(
+            nullptr,
+            "Load Flag List",
+            QDir::homePath(),
+            "Path Files (*.path);;All Files (*.*)"
+    );
+
+    if (filePath.isEmpty()) {
+        qDebug() << "No file selected.";
+        return;
+    }
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Failed to open file for reading:" << filePath;
+        return;
+    }
+
+    QTextStream stream(&file);
+
+    while (!stream.atEnd()) {
+        QString line = stream.readLine();
+        QStringList components = line.split(" ", Qt::SkipEmptyParts);
+
+        if (components.size() != 3) {
+            qDebug() << "Invalid line format, skipping:" << line;
+            continue;
+        }
+
+        bool okX, okY, okZ;
+        float x = components[0].toFloat(&okX);
+        float y = components[1].toFloat(&okY);
+        float z = components[2].toFloat(&okZ);
+
+        if (okX && okY && okZ) {
+            mFlagLists.emplace_back(x, y, z);
+        } else {
+            qDebug() << "Invalid data in line, skipping:" << line;
+        }
+    }
+
+    file.close();
+
+}

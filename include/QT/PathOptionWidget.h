@@ -17,6 +17,7 @@ private:
     QWidget* constructSendWidget();
     QWidget* constructResetWidget();
     QWidget* constructSavePathWidget();
+    QWidget* constructLoadPathWidget();
 
 
 public:

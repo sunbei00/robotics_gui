@@ -24,7 +24,7 @@ QNode::QNode(QObject* parent) : QThread(parent){
     pointcloud_subscription_ = node->create_subscription<sensor_msgs::msg::PointCloud2>(
             "lio_sam/mapping/cloud_registered", qos, std::bind(&QNode::pointcloud_callback, this, std::placeholders::_1));
 
-    path_publisher_ = node->create_publisher<nav_msgs::msg::Path>("/Planning/local_path", 10);
+    path_publisher_ = node->create_publisher<nav_msgs::msg::Path>("/plans", 10);
 
     connect(this, &QNode::sAddPointCloud, QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::addInterleavedPointCloud);
     connect(this, &QNode::sSetRobotPose, QTHub::RobotHub::getSingleton(), &QTHub::RobotHub::setRobotPose);
@@ -89,14 +89,22 @@ void QNode::run(){
 }
 
 void QNode::sendTopic(std::vector<glm::vec3> path) {
+    if (timer_ && !timer_->is_canceled())
+        timer_->cancel();
 
+    calculatePathMessage(path);
+
+    timer_ = node->create_wall_timer(
+            std::chrono::seconds(3),
+            [this]() { timer_callback(); });
+}
+
+void QNode::calculatePathMessage(const std::vector<glm::vec3>& path) {
     rclcpp::Time now = node->now();
+    path_msg_ = nav_msgs::msg::Path();
+    path_msg_.header.frame_id = "map";
 
-    nav_msgs::msg::Path path_msg;
-    path_msg.header.stamp = now;
-    path_msg.header.frame_id = "map";
-    for (const auto &pos : path)
-    {
+    for (const auto& pos : path) {
         geometry_msgs::msg::PoseStamped pose;
         pose.header.stamp = now;
         pose.header.frame_id = "map";
@@ -104,8 +112,12 @@ void QNode::sendTopic(std::vector<glm::vec3> path) {
         pose.pose.position.y = pos.y;
         pose.pose.position.z = pos.z;
         pose.pose.orientation.w = 1.0;
-        path_msg.poses.push_back(pose);
+        path_msg_.poses.push_back(pose);
     }
-    path_publisher_->publish(path_msg);
+}
+
+void QNode::timer_callback() {
+    path_msg_.header.stamp = node->now();
+    path_publisher_->publish(path_msg_);
 }
 

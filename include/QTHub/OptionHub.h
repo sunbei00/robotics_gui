@@ -25,6 +25,8 @@ namespace QTHub {
         void sUndoFlag();
         void sResetFlag();
         void sSendFlag();
+        void sSaveFlag();
+        void sLoadFlag();
     public slots:
         void setTopView(bool isTopView);
         void setRobotTracking(bool isTracking);
@@ -33,6 +35,8 @@ namespace QTHub {
         void undoFlag();
         void resetFlag();
         void sendFlag();
+        void savePath();
+        void loadPath();
     };
 
 }

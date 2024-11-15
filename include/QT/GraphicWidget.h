@@ -58,8 +58,9 @@ public slots:
     void addSeparatedPointCloudRenderer(const Graphics::pcd_data& pointCloud, DATA::Field field);
 
     void sendPath();
-
     void clearMap();
+    void savePath();
+    void loadPath();
 
 signals:
     void sSendPath(std::vector<glm::vec3>);

@@ -19,7 +19,9 @@ class MainWindow;
 class QNode : public QThread{
     Q_OBJECT
 private:
+    rclcpp::TimerBase::SharedPtr timer_;
     std::shared_ptr<rclcpp::Node> node;
+    nav_msgs::msg::Path path_msg_;
 
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_subscription_;
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr pointcloud_subscription_;
@@ -28,6 +30,8 @@ private:
 private:
     void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg);
     void pointcloud_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg);
+    void timer_callback();
+    void calculatePathMessage(const std::vector<glm::vec3>& path);
 
 signals:
     void sAddPointCloud(const std::vector<glm::vec3>& point_cloud, DATA::Field field);
