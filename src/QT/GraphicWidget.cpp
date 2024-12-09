@@ -23,7 +23,7 @@ OpenGLWidget::OpenGLWidget(QWidget *parent)
         : QOpenGLWidget(parent), mSelectedOptionMenu(0), mRobotRenderer(DATA::Field(),nullptr){
     mTimer = new QTimer(this);
     connect(mTimer, &QTimer::timeout, this, &OpenGLWidget::widgetUpdate);
-    mTimer->start(16); // 60 fps
+    mTimer->start(33); // 30 fps
 
     connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sTopView, this, [this](bool isTopView){mCamera.setTopView(isTopView);});
     connect(QTHub::OptionHub::getSingleton(), &QTHub::OptionHub::sRobotTracking, this, [this](bool isRobotTracking){ mIsRobotTracking = isRobotTracking;});
@@ -81,6 +81,8 @@ void OpenGLWidget::initializeGL() {
         glm::vec3(0.0f, -0.2f, 0.2f),  // Vertex B (Bottom Left)
         glm::vec3(0.0f, 0.2f, 0.2f)    // Vertex C (Bottom Right)
     };
+    for(auto& it : triangle)
+        it *= 2.5f; // scale
     mTriangleRobotRenderer = {triangleRobotField, new Graphics::TriangleRenderer(triangle, this)};
 
 }
@@ -105,7 +107,12 @@ void OpenGLWidget::paintGL() {
         mFlagRenderer.second->draw(mCamera);
     }
 
-    if(!mFlagLists.empty()) {
+    static size_t size = mFlagLists.size();
+    static Graphics::IGraphicalBase* lineRenderer = nullptr;
+
+    if(size != mFlagLists.size()) {
+        size = mFlagLists.size();
+
         std::vector<glm::vec3> vertices;
         vertices.push_back(mRobotPose.position);
         vertices.push_back(mRobotPose.position);
@@ -113,13 +120,15 @@ void OpenGLWidget::paintGL() {
             vertices.push_back(FlagPos);
 
         //mPath = mIsSent ? mPath : Utils::sampleCatmullRomSpline(vertices, 20);
-        mPath = Utils::sampleCatmullRomSpline(vertices, 20);
+        std::vector<glm::vec3> mPath = Utils::sampleCatmullRomSpline(vertices, 20);
 
-        Graphics::IGraphicalBase* lineRenderer = new Graphics::LineRenderer(mPath, this);
-
-        lineRenderer->draw(mCamera);
-        delete lineRenderer;
+        if(lineRenderer != nullptr)
+            delete lineRenderer;
+        lineRenderer = new Graphics::LineRenderer(mPath, this);
     }
+
+    if(lineRenderer && size >= 1)
+        lineRenderer->draw(mCamera);
 
 }
 
@@ -187,23 +196,33 @@ void OpenGLWidget::addSeparatedPointCloudRenderer(const Graphics::pcd_data& poin
 
 void OpenGLWidget::sendPath() {
     mIsSent = true;
-    if(mPath.empty())
-        return;
 
-    std::vector<glm::vec3> finalPath;
+    std::vector<glm::vec3> vertices;
+    vertices.push_back(mRobotPose.position);
+    vertices.push_back(mRobotPose.position);
+    for(glm::vec3 FlagPos : mFlagLists)
+        vertices.push_back(FlagPos);
 
-    for(size_t i = 1; i < mPath.size(); i++){
-        glm::vec3& srcPose = mPath[i-1];
-        glm::vec3& targetPose = mPath[i];
+    emit sSendPath(vertices);
 
-        constexpr float inter_cm = 4;
-
-        auto interpolated = Utils::interpolateBetweenPoints(srcPose, targetPose, inter_cm);
-        for(auto inter_pos : interpolated)
-            finalPath.push_back(inter_pos);
-    }
-
-    emit sSendPath(finalPath);
+    // std::vector<glm::vec3> mPath = Utils::sampleCatmullRomSpline(vertices, 20);
+    // if(mPath.empty())
+    //     return;
+    //
+    // std::vector<glm::vec3> finalPath;
+    //
+    // for(size_t i = 1; i < mPath.size(); i++){
+    //     glm::vec3& srcPose = mPath[i-1];
+    //     glm::vec3& targetPose = mPath[i];
+    //
+    //     constexpr float inter_cm = 4;
+    //
+    //     auto interpolated = Utils::interpolateBetweenPoints(srcPose, targetPose, inter_cm);
+    //     for(auto inter_pos : interpolated)
+    //         finalPath.push_back(inter_pos);
+    // }
+    //
+    // emit sSendPath(finalPath);
 }
 
 void OpenGLWidget::clearMap() {

@@ -33,6 +33,7 @@ namespace Graphics{
         Camera mCamera;
         Camera mTopCamera;
         bool mIsTopView;
+        bool mIsOrthogonalView;
 
         float mTranslationSpeed = 1.0;
         float mRotationSpeed = 1.0;
@@ -51,10 +52,12 @@ namespace Graphics{
         glm::vec3 rayCast(glm::vec2 mousePos); // Top View Ray Cast - z : 0
 
         bool getIsTopView() const;
+        bool getIsOrthogonalView() const;
         glm::vec3 getEyePos() const;
         glm::vec3 getCenPos() const;
         glm::mat4 getViewMatrix() const;
         glm::mat4 getPerspectiveMatrix() const;
+        glm::mat4 getOrthogonalMatrix() const;
         float getDistance() const;
     };
 }

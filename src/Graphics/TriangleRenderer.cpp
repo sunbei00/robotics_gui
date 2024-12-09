@@ -35,7 +35,8 @@ namespace Graphics{
         GLuint shaderProgram = getProgram();
 
         glFunc->glUseProgram(shaderProgram);
-        setMVPUniform(camera.getViewMatrix(), camera.getPerspectiveMatrix());
+        setMVPUniform(camera.getViewMatrix(), camera.getIsOrthogonalView()? camera.getOrthogonalMatrix() : camera.getPerspectiveMatrix());
+
 
         GLint viewPosLoc    = glFunc->glGetUniformLocation(shaderProgram, "viewPos");
         glFunc->glUniform3fv(viewPosLoc, 1, glm::value_ptr(camera.getEyePos()));
@@ -123,7 +124,8 @@ namespace Graphics {
     void TriangleRenderer::draw(const InteractionCamera& camera) {
         GLuint shaderProgram = getProgram();
         glFunc->glUseProgram(shaderProgram);
-        setMVPUniform(camera.getViewMatrix(), camera.getPerspectiveMatrix());
+        setMVPUniform(camera.getViewMatrix(), camera.getIsOrthogonalView()? camera.getOrthogonalMatrix() : camera.getPerspectiveMatrix());
+
 
         GLint pointColorLoc = glFunc->glGetUniformLocation(shaderProgram, "triangleColor");
         glFunc->glUniform3fv(pointColorLoc, 1, &mColor.x);

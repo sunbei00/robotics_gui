@@ -24,7 +24,7 @@ QNode::QNode(QObject* parent) : QThread(parent){
     pointcloud_subscription_ = node->create_subscription<sensor_msgs::msg::PointCloud2>(
             "lio_sam/mapping/cloud_registered", qos, std::bind(&QNode::pointcloud_callback, this, std::placeholders::_1));
 
-    path_publisher_ = node->create_publisher<nav_msgs::msg::Path>("/plans", 10);
+    path_publisher_ = node->create_publisher<nav_msgs::msg::Path>("/plan", 10);
 
     connect(this, &QNode::sAddPointCloud, QTHub::GraphicHub::getSingleton(), &QTHub::GraphicHub::addInterleavedPointCloud);
     connect(this, &QNode::sSetRobotPose, QTHub::RobotHub::getSingleton(), &QTHub::RobotHub::setRobotPose);

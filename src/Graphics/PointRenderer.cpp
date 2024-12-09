@@ -76,7 +76,8 @@ namespace Graphics{
 
     void PointRendererSeparated::draw(const InteractionCamera& camera) {
         glFunc->glUseProgram(getProgram());
-        setMVPUniform(camera.getViewMatrix(), camera.getPerspectiveMatrix());
+        setMVPUniform(camera.getViewMatrix(), camera.getIsOrthogonalView()? camera.getOrthogonalMatrix() : camera.getPerspectiveMatrix());
+
 
         GLint pointColorLoc = glFunc->glGetUniformLocation(getProgram(), "pointColor");
         glFunc->glUniform3fv(pointColorLoc, 1, &mColor.x);
@@ -166,7 +167,8 @@ namespace Graphics{
 
     void PointRendererSeparatedFiltered::draw(const InteractionCamera& camera) {
         glFunc->glUseProgram(getProgram());
-        setMVPUniform(camera.getViewMatrix(), camera.getPerspectiveMatrix());
+        setMVPUniform(camera.getViewMatrix(), camera.getIsOrthogonalView()? camera.getOrthogonalMatrix() : camera.getPerspectiveMatrix());
+
 
         GLint pointColorLoc = glFunc->glGetUniformLocation(getProgram(), "pointColor");
         glFunc->glUniform3fv(pointColorLoc, 1, &mColor.x);
@@ -240,7 +242,7 @@ namespace Graphics{
 
     void PointRendererInterleaved::draw(const InteractionCamera& camera) {
         glFunc->glUseProgram(getProgram());
-        setMVPUniform(camera.getViewMatrix(), camera.getPerspectiveMatrix());
+        setMVPUniform(camera.getViewMatrix(), camera.getIsOrthogonalView()? camera.getOrthogonalMatrix() : camera.getPerspectiveMatrix());
 
         GLint pointColorLoc = glFunc->glGetUniformLocation(getProgram(), "pointColor");
         glFunc->glUniform3fv(pointColorLoc, 1, &mColor.x);
@@ -309,7 +311,8 @@ namespace Graphics{
 
     void PointRendererInterleavedFiltered::draw(const InteractionCamera& camera) {
         glFunc->glUseProgram(getProgram());
-        setMVPUniform(camera.getViewMatrix(), camera.getPerspectiveMatrix());
+        setMVPUniform(camera.getViewMatrix(), camera.getIsOrthogonalView()? camera.getOrthogonalMatrix() : camera.getPerspectiveMatrix());
+
 
         GLint pointColorLoc = glFunc->glGetUniformLocation(getProgram(), "pointColor");
         glFunc->glUniform3fv(pointColorLoc, 1, &mColor.x);

@@ -58,7 +58,8 @@ namespace Graphics{
     void LineRenderer::draw(const InteractionCamera& camera) {
         GLuint shaderProgram = getProgram();
         glFunc->glUseProgram(shaderProgram);
-        setMVPUniform(camera.getViewMatrix(), camera.getPerspectiveMatrix());
+        setMVPUniform(camera.getViewMatrix(), camera.getIsOrthogonalView()? camera.getOrthogonalMatrix() : camera.getPerspectiveMatrix());
+
 
         GLint pointColorLoc = glFunc->glGetUniformLocation(getProgram(), "lineColor");
         GLint lineWidthLocation = glFunc->glGetUniformLocation(shaderProgram, "lineWidth");

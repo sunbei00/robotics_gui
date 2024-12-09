@@ -31,8 +31,6 @@ protected:
     std::pair<DATA::Field, Graphics::IGraphicalBase*> mFlagRenderer;
     std::vector<glm::vec3> mFlagLists;
 
-    std::vector<glm::vec3> mPath;
-
 protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;

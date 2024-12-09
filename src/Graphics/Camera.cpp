@@ -8,7 +8,7 @@
 
 namespace Graphics {
 
-    InteractionCamera::InteractionCamera(bool isTopView) : mMouseState(MOUSE_STATE::IDLE), mIsTopView(false) {
+    InteractionCamera::InteractionCamera(bool isTopView) : mMouseState(MOUSE_STATE::IDLE), mIsTopView(false), mIsOrthogonalView(true) {
         mCamera = { { 0.0, 10, 8 }, { 0,0,0 }, { 0,0,1 }, {1920, 1080} };
         mTopCamera.up = glm::vec3(0.0f, 1.0f, 0.0f);
         setTopView(isTopView);
@@ -70,27 +70,62 @@ namespace Graphics {
     glm::vec3 InteractionCamera::rayCast(glm::vec2 mousePos) {
         assert(mIsTopView);
 
-        glm::mat4 view = getViewMatrix();
-        glm::mat4 perspective = getPerspectiveMatrix();
+        if(mIsOrthogonalView)
+        {
+            assert(mIsTopView);
 
-        float x = (2.0f * mousePos.x) / mTopCamera.rect.x - 1.0f;
-        float y = 1.0f - (2.0f * mousePos.y) / mTopCamera.rect.y;
-        float z = 1.0f;
-        glm::vec3 ray_nds = glm::vec3(x, y, z);
+            // Orthogonal Matrix와 View Matrix 가져오기
+            glm::mat4 view = getViewMatrix();
+            glm::mat4 orthogonal = getOrthogonalMatrix();
 
-        glm::vec4 ray_clip = glm::vec4(ray_nds, 1.0);
+            // Normalized Device Coordinates(NDC)로 마우스 좌표 변환
+            float x = (2.0f * mousePos.x) / mTopCamera.rect.x - 1.0f;
+            float y = 1.0f - (2.0f * mousePos.y) / mTopCamera.rect.y;
+            float z = 0.0f;  // Orthogonal에서는 클리핑 공간의 Z 값은 상관없음
+            glm::vec3 ray_nds = glm::vec3(x, y, z);
 
-        glm::vec4 ray_eye = glm::inverse(perspective) * ray_clip;
-        ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
+            // Clip Space로 변환
+            glm::vec4 ray_clip = glm::vec4(ray_nds, 1.0);
 
-        glm::vec3 ray_wor = glm::vec3(glm::inverse(view) * ray_eye);
-        glm::vec3 ray_direction  = glm::normalize(ray_wor);
+            // View Space로 변환
+            glm::vec4 ray_eye = glm::inverse(orthogonal) * ray_clip;
 
-        glm::vec3 ray_origin = mTopCamera.eye;
+            // World Space로 변환
+            glm::vec3 ray_origin = glm::vec3(glm::inverse(view) * ray_eye);
 
-        float t = (0 - ray_origin.z) / ray_direction.z;
-        glm::vec3 intersection = ray_origin + t * ray_direction;
-        return intersection;
+            // Ray 방향은 Orthogonal에서 항상 -Z 방향
+            glm::vec3 ray_direction = glm::vec3(0.0f, 0.0f, -1.0f);
+
+            // Z = 0 평면과의 교차점 계산
+            float t = -ray_origin.z / ray_direction.z;
+            glm::vec3 intersection = ray_origin + t * ray_direction;
+
+            return intersection;
+
+        } else
+        {
+            glm::mat4 view = getViewMatrix();
+            glm::mat4 perspective = getPerspectiveMatrix();
+
+            float x = (2.0f * mousePos.x) / mTopCamera.rect.x - 1.0f;
+            float y = 1.0f - (2.0f * mousePos.y) / mTopCamera.rect.y;
+            float z = 1.0f;
+            glm::vec3 ray_nds = glm::vec3(x, y, z);
+
+            glm::vec4 ray_clip = glm::vec4(ray_nds, 1.0);
+
+            glm::vec4 ray_eye = glm::inverse(perspective) * ray_clip;
+            ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
+
+            glm::vec3 ray_wor = glm::vec3(glm::inverse(view) * ray_eye);
+            glm::vec3 ray_direction  = glm::normalize(ray_wor);
+
+            glm::vec3 ray_origin = mTopCamera.eye;
+
+            float t = (0 - ray_origin.z) / ray_direction.z;
+            glm::vec3 intersection = ray_origin + t * ray_direction;
+            return intersection;
+        }
     }
 
     void InteractionCamera::moveInteraction(glm::vec2 mousePos){
@@ -154,6 +189,11 @@ namespace Graphics {
         return mIsTopView;
     }
 
+    bool InteractionCamera::getIsOrthogonalView() const
+    {
+        return mIsOrthogonalView && mIsTopView;
+    }
+
     glm::mat4 InteractionCamera::getViewMatrix() const{
         Camera tempCamera = mIsTopView ? mTopCamera : mCamera;
 
@@ -174,6 +214,20 @@ namespace Graphics {
         return glm::perspective(glm::radians(60.0f), (float)tempCamera.rect.x / (float)tempCamera.rect.y, 0.01f, 1000.0f);
     }
 
+    glm::mat4 InteractionCamera::getOrthogonalMatrix() const {
+        Camera tempCamera = mIsTopView ? mTopCamera : mCamera;
+        float aspectRatio = (float)tempCamera.rect.x / (float)tempCamera.rect.y;
+
+        // 중심과 범위를 조정
+        float width = glm::distance(mCamera.cen, mCamera.eye)*4;
+        float height = width / aspectRatio; // 세로 범위는 가로 범위에 종속
+
+        return glm::ortho(
+            -width / 2.0f, width / 2.0f,  // Left, Right
+            -height / 2.0f, height / 2.0f, // Bottom, Top
+            0.01f, 1000.0f                 // Near, Far
+        );
+    }
     float InteractionCamera::getDistance() const {
         return glm::length(mCamera.eye - mCamera.cen);
     }
